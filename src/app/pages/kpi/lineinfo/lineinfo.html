@@ -1,0 +1,89 @@
+<div class="dx-card kpi-card">
+  <div class="card-header">
+    <div class="card-actions-wrapper">
+      <div
+        class="card-label"
+        [class.is-running]="displayStatus() === 'running'"
+        [class.is-stop]="displayStatus() === 'stop'">
+        {{ lineId() }}
+      </div>
+    </div>
+
+    <div class="card-menu-button">
+      <dx-drop-down-button
+        icon="mdi mdi-dots-vertical"
+        stylingMode="text"
+        [items]="menuItems"
+        displayExpr="text"
+        [showArrowIcon]="false"
+        keyExpr="id"
+        [useSelectMode]="false"
+        [dropDownOptions]="{ width: 160 }"
+        (onItemClick)="handleMenuItemClick($event)">
+      </dx-drop-down-button>
+    </div>
+  </div>
+    <div class="kpi-row-meters">
+      <div
+        class="kpi-label-l"
+        [class.is-running]="displayStatus() === 'running'"
+        [class.is-stop]="displayStatus() === 'stop'">
+        Status:
+      </div>
+      <div
+        class="kpi-label-v"
+        [class.is-running]="displayStatus() === 'running'"
+        [class.is-stop]="displayStatus() === 'stop'">
+        {{ displayStatus() }}
+      </div>
+    </div>
+
+  <div class="card-content kpi-grid">
+    @for (r of rows; track r.label) {
+      <div class="kpi-row">
+        <div class="kpi-label">{{ r.label }}</div>
+        <div class="kpi-value" [style.color]="r.color">{{ r.value }}</div>
+      </div>
+    }
+    <div class="kpi-row-meters">
+      <div
+        class="kpi-label-l"
+        [class.is-running]="displayStatus() === 'running'"
+        [class.is-stop]="displayStatus() === 'stop'">
+        Meters:
+      </div>
+      <div
+        class="kpi-label-v"
+        [class.is-running]="displayStatus() === 'running'"
+        [class.is-stop]="displayStatus() === 'stop'">
+        {{ mtrs() }}
+      </div>
+    </div>
+  </div>
+  <div
+    class="kpi-progress"
+    role="progressbar"
+    [attr.aria-valuemin]="mtrsStartValue()"
+    [attr.aria-valuemax]="mtrsEndValue()"
+    [attr.aria-valuenow]="mtrs()"
+  >
+    <div class="kpi-progress-track">
+      <div
+        class="kpi-progress-fill"
+        [class.is-stop]="displayStatus() === 'stop'"
+        [style.width.%]="progressPercent()"
+      ></div>
+    </div>
+    <div
+      class="kpi-progress-label"
+      [class.is-stop]="displayStatus() === 'stop'"
+    >
+      {{ progressPercent() | number:'1.0-0' }}%
+    </div>
+  </div>
+  @if (loading) {
+    <div class="card-overlay">
+      <dx-load-indicator></dx-load-indicator>
+    </div>
+  }
+</div>

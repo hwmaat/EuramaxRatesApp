@@ -1,0 +1,25 @@
+<app-server-down-banner></app-server-down-banner>
+<app-global-error></app-global-error>
+@if (auth.status() === 'authenticated') {
+    <app-header (toggleMenu)="toggleDrawer()"></app-header>
+    <main class="content">
+      <dx-drawer
+          [opened]="isDrawerOpen"
+          template="menu"
+          [minSize]="0"
+          [maxSize]="220"
+          position="left"
+          revealMode="expand"
+          >
+          <div *dxTemplate="let data of 'menu'">
+            <side-menu (menuItemClick)="onMenuItemClick($event)"></side-menu>
+          </div>
+          <router-outlet></router-outlet>
+      </dx-drawer>
+    </main>
+    
+    <app-footer class="page-footer"></app-footer>
+
+} @else {
+  <router-outlet></router-outlet>
+}

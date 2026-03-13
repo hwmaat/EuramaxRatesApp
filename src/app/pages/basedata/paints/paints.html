@@ -1,0 +1,94 @@
+<div class="em-container">
+	<ams-load-panel
+		[visible]="loading"
+		[message]="loadingMessage"
+		[shading]="true"
+		[shadingColor]="'rgba(0,0,0,0.4)'">
+	</ams-load-panel>
+
+	<dx-toolbar class="ams-toolbar">
+		<dxi-item location="before">
+			<div class="toolbar-title"></div>
+		</dxi-item>
+	</dx-toolbar>
+
+	<dx-data-grid
+		#gridContainer
+		id="gridContainer"
+		[dataSource]="records"
+		keyExpr="id"
+		[focusedRowEnabled]="true"
+		[hoverStateEnabled]="true"
+		(onExporting)="onExporting($event, 'Paints')"
+		(onToolbarPreparing)="onToolbarPreparing($event)"
+		(onSelectionChanged)="onSelectionChanged($event)"
+		[cellHintEnabled]="true">
+		<dxo-scrolling rowRenderingMode="virtual"></dxo-scrolling>
+		<dxo-selection
+			[mode]="selectionMode"
+			showCheckBoxesMode="onClick"
+			selectAllMode="page"
+			allowSelectAll="true">
+		</dxo-selection>
+		<dxo-editing
+			mode="row"
+			[allowUpdating]="false"
+			[allowDeleting]="false"
+			[allowAdding]="false"
+			[useIcons]="false"
+			[confirmDelete]="false">
+		</dxo-editing>
+		<dxo-master-detail [enabled]="true" template="paintDetail"></dxo-master-detail>
+		<dxo-paging [enabled]="true" [pageSize]="pageSize"></dxo-paging>
+		<dxo-pager
+			[visible]="true"
+			[showPageSizeSelector]="true"
+			[showInfo]="true"
+			[showNavigationButtons]="true"
+			[allowedPageSizes]="[5, 10, 15, 20, 25, 100]"
+			[displayMode]="'full'">
+		</dxo-pager>
+
+		<dxi-column dataField="id" caption="id#" [width]="75"></dxi-column>
+		<dxi-column dataField="paintCode" caption="paintCode" [width]="120"></dxi-column>
+		<dxi-column dataField="paintDescription" caption="paintDescription" [width]="220"></dxi-column>
+		<dxi-column dataField="productionLine" caption="productionLine" [width]="110"></dxi-column>
+		<dxi-column dataField="paintSystem" caption="paintSystem" [width]="160"></dxi-column>
+		<dxi-column dataField="manufacturer" caption="manufacturer" [width]="160"></dxi-column>
+		<dxi-column dataField="metallicType" caption="metallicType" [width]="120"></dxi-column>
+		<dxi-column dataField="nonWhite" caption="nonWhite" dataType="boolean" [width]="85"></dxi-column>
+		<dxi-column dataField="aluNatur" caption="aluNatur" dataType="boolean" [width]="85"></dxi-column>
+		<dxi-column dataField="volumeFractionOfSolid" caption="volumeFraction" [width]="120" dataType="number" [format]="fixedformat2" alignment="right"></dxi-column>
+		<dxi-column dataField="isPrimer" caption="isPrimer" dataType="boolean" [width]="85"></dxi-column>
+		<dxi-column dataField="isWrinkle" caption="isWrinkle" dataType="boolean" [width]="85"></dxi-column>
+		<dxi-column dataField="isTransparentOrClearCoat" caption="clearCoat" dataType="boolean" [width]="120"></dxi-column>
+		<dxi-column caption="specMetrixExceptions" dataType="number" [width]="180" [calculateCellValue]="specMetrixExceptionCount" alignment="right"></dxi-column>
+		<dxi-column dataField="" width="100%" caption=""></dxi-column>
+
+		<div *dxTemplate="let detail of 'paintDetail'">
+			<div class="production-detail">
+				<div class="production-detail-section">
+					<dx-data-grid
+						[dataSource]="specMetrixRows(detail.data)"
+						keyExpr="id"
+						[showBorders]="true"
+						[showColumnLines]="true"
+						[hoverStateEnabled]="false"
+						[rowAlternationEnabled]="true"
+						noDataText="No SpecMetrix exceptions">
+						<dxi-column dataField="recipeDryId" caption="recipeDryId" [width]="120"></dxi-column>
+						<dxi-column dataField="recipeDryCode" caption="recipeDryCode" [width]="160"></dxi-column>
+						<dxi-column dataField="recipeWetId" caption="recipeWetId" [width]="120"></dxi-column>
+						<dxi-column dataField="recipeWetCode" caption="recipeWetCode" [width]="160"></dxi-column>
+						<dxi-column dataField="created" caption="created" dataType="datetime" format="dd/MM/yyyy HH:mm" [width]="180"></dxi-column>
+						<dxi-column dataField="updated" caption="updated" dataType="datetime" format="dd/MM/yyyy HH:mm" [width]="180"></dxi-column>
+					</dx-data-grid>
+				</div>
+			</div>
+		</div>
+
+		<dxo-summary>
+			<dxi-group-item summaryType="count" displayFormat="{0}" [showInGroupFooter]="false"></dxi-group-item>
+		</dxo-summary>
+	</dx-data-grid>
+</div>

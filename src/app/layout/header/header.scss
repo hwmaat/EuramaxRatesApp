@@ -1,0 +1,85 @@
+
+
+.menu-btn { font-size: 20px; background: transparent; border: none; cursor: pointer; padding: 8px 12px; }
+
+.header-caption {
+  margin-left: 10px;
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
+  color:yellow
+}
+ .header-container {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 60px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  background-color: #008671 !important;
+  padding-top: 0;
+
+}
+
+.left-div {
+  flex: 1 1 0;
+  min-width: 0;              // allow shrinking so center stays perfectly centered
+  display: flex;
+  color: white;
+  align-items: center;
+  .menu-btn { font-size: 20px; background: transparent; color:white;border: none; cursor: pointer; padding: 8px 12px; }
+}
+
+.center-div {
+  flex: 0 0 auto;            // take only the space needed by the logo
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+
+  // remove absolute centering
+  position: static;
+  transform: none;
+  width: auto;
+}
+
+.right-div {
+  flex: 1 1 0;
+  min-width: 0;              // allow shrinking symmetrically with left
+  display: flex;
+  justify-content: flex-end; // align right content to the right edge of its area
+  align-items: center;
+}
+
+.header-mode-dev{
+  color:yellow
+}
+
+.header-mode-prod{
+  background-color: red;
+  color:yellow
+}
+
+.admin-info {
+  margin-left:10px;
+}
+
+::ng-deep .username .dx-button-has-text .dx-button-content  .dx-button-text{
+  color: white!important;
+}
+
+.environment-prod{
+  background-color: black;
+  color: red !important;
+  width: 250px;
+  text-align: center;
+}
+
+.environment-test{
+  background-color: black;
+  color: yellowgreen !important;
+  width: 250px;
+  text-align: center;
+}

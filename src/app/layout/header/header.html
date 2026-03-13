@@ -1,0 +1,13 @@
+ <div class="header-container">
+  <div class="left-div">
+    <dx-button class="menu-btn" type="default" (onClick)="toggleMenu.emit()" hint="Toggle menu">☰</dx-button>
+  </div>
+
+  <div class = "center-div">
+      <img [src]="logoUrl()" alt="Euramax Logo" style="max-height: 18px;" />
+      <span class="header-caption">{{ caption() }}</span>
+  </div>
+
+    <app-topmenu class = "right-div" (menuItemClick)="onMenuItemClick($event)"></app-topmenu>
+
+</div>

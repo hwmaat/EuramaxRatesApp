@@ -1,0 +1,22 @@
+@if (visible) {
+  <div class="ams-load-panel-container">
+    <dx-load-panel
+      [visible]="visible"
+      [showIndicator]="showIndicator"
+      [showPane]="showPane"
+      [shading]="shading"
+      [shadingColor]="shadingColor"
+      [position]="position"
+      [width]="width"
+      [height]="height"
+      >
+    </dx-load-panel>
+    <div class="ams-load-panel-overlay">
+      <div class="ams-load-panel-content">
+        <div class="ams-load-panel-message">
+          {{ message }}
+        </div>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,143 @@
+<div class="em-container">
+	<ams-load-panel
+		[visible]="loading"
+		[message]="loadingMessage"
+		[shading]="true"
+		[shadingColor]="'rgba(0,0,0,0.4)'">
+	</ams-load-panel>
+
+	<dx-toolbar class="ams-toolbar">
+		<dxi-item location="before">
+			<div class="toolbar-title"></div>
+		</dxi-item>
+	</dx-toolbar>
+
+	<dx-data-grid
+		#gridContainer
+		id="gridContainer"
+		[dataSource]="records"
+		keyExpr="id"
+		[focusedRowEnabled]="true"
+		[hoverStateEnabled]="true"
+		(onExporting)="onExporting($event, 'Finishes')"
+		(onToolbarPreparing)="onToolbarPreparing($event)"
+		(onRowRemoving)="onRowRemoving($event)"
+		(onSelectionChanged)="onSelectionChanged($event)"
+		(onEditCanceled)="ResetEdit()"
+		[cellHintEnabled]="true">
+		<dxo-scrolling rowRenderingMode="virtual"></dxo-scrolling>
+		<dxo-selection
+			[mode]="selectionMode"
+			showCheckBoxesMode="onClick"
+			selectAllMode="page"
+			allowSelectAll="true">
+		</dxo-selection>
+		<dxo-editing
+			mode="row"
+			[allowUpdating]="false"
+			[allowDeleting]="false"
+			[allowAdding]="false"
+			[useIcons]="false"
+			[confirmDelete]="false">
+		</dxo-editing>
+		<dxo-master-detail [enabled]="true" template="paintLayerDetail"></dxo-master-detail>
+		<dxo-paging [enabled]="true" [pageSize]="pageSize"></dxo-paging>
+		<dxo-pager
+			[visible]="true"
+			[showPageSizeSelector]="true"
+			[showInfo]="true"
+			[showNavigationButtons]="true"
+			[allowedPageSizes]="[5, 10, 15, 20, 25, 100]"
+			[displayMode]="'full'">
+		</dxo-pager>
+
+		<dxi-column caption="action" [width]="125" cellTemplate="buttonrowtemplate" [fixed]="true" fixedPosition="left"></dxi-column>
+        <dxi-column dataField="id" caption="id#" [width]="75"></dxi-column>
+		<dxi-column dataField="finishCode" caption="finishCode" [width]="160"></dxi-column>
+		<dxi-column dataField="paintLine" caption="paintLine" [width]="90"></dxi-column>
+		<dxi-column dataField="customer" caption="customer" [width]="180"></dxi-column>
+		<dxi-column dataField="customerNumber" caption="customer#" [width]="120"></dxi-column>
+		<dxi-column dataField="substrate" caption="substrate" [width]="110"></dxi-column>
+		<dxi-column dataField="surfaceTreatment" caption="surfaceTreatment" [width]="140"></dxi-column>
+		<dxi-column dataField="surfaceQuality" caption="surfaceQuality" [width]="140"></dxi-column>
+		<dxi-column dataField="preTreatment" caption="preTreatment" [width]="120"></dxi-column>
+		<dxi-column dataField="runs" caption="runs" [width]="70" dataType="number" [format]="fixedformat0" alignment="right"></dxi-column>
+		<dxi-column dataField="side" caption="side" [width]="90"></dxi-column>
+		<dxi-column dataField="maxSpeedRun1" caption="maxSpeedRun1" [width]="130" dataType="number" [format]="fixedformat2" alignment="right"></dxi-column>
+		<dxi-column dataField="maxSpeedRun2" caption="maxSpeedRun2" [width]="130" dataType="number" [format]="fixedformat2" alignment="right"></dxi-column>
+		<dxi-column dataField="maxSpeedRun3" caption="maxSpeedRun3" [width]="130" dataType="number" [format]="fixedformat2" alignment="right"></dxi-column>
+		<dxi-column dataField="state" caption="state" [width]="90"></dxi-column>
+		<dxi-column dataField="version" caption="version" [width]="90"></dxi-column>
+		<dxi-column caption="layers" [width]="70" dataType="number" alignment="right" [calculateCellValue]="paintLayerCount"></dxi-column>
+		<dxi-column dataField="" width="100%" caption=""></dxi-column>
+
+		<div *dxTemplate="let data of 'buttonrowtemplate'">
+			<div class="button-column">
+				<dx-button icon="edit" hint="edit Order data" stylingMode="text" (onClick)="EditRecord(data)" class="small-icon" [visible]="!(data.row.isEditing)"></dx-button>
+				<dx-button icon="trash" hint="delete record" stylingMode="text" (onClick)="DeleteRecord(data)" class="small-icon" [visible]="!(data.row.isEditing)"></dx-button>
+				<dx-button icon="revert" stylingMode="text" (onClick)="CancelEdit(data)" class="small-icon" [visible]="data.row.isEditing"></dx-button>
+				<dx-button icon="save" stylingMode="text" (onClick)="SaveRecord(data)" class="small-icon" [visible]="data.row.isEditing"></dx-button>
+			</div>
+		</div>
+
+		<div *dxTemplate="let detail of 'paintLayerDetail'">
+			<div class="production-detail">
+				<div class="production-detail-section">
+					<dx-data-grid
+						[dataSource]="paintLayerRows(detail.data)"
+						keyExpr="id"
+						[showBorders]="true"
+						[showColumnLines]="true"
+						[hoverStateEnabled]="false"
+						[rowAlternationEnabled]="true"
+                        [groupPanel]='{ visible: false}'
+						[searchPanel]='{ visible: false}'>
+						<dxi-column dataField="layerNumber" caption="Layer" [width]="80" dataType="number" alignment="right"></dxi-column>
+						<dxi-column dataField="side" caption="Side" [width]="110"></dxi-column>
+						<dxi-column dataField="layerThickness" caption="Thickness" [width]="110" dataType="number" [format]="fixedformat2" alignment="right"></dxi-column>
+						<dxi-column dataField="paintSystem.name" caption="Paint System" [width]="140"></dxi-column>
+					</dx-data-grid>
+				</div>
+			</div>
+		</div>
+
+		<dxo-summary>
+			<dxi-group-item summaryType="count" displayFormat="{0}" [showInGroupFooter]="false"></dxi-group-item>
+		</dxo-summary>
+	</dx-data-grid>
+
+	<app-finishes-add
+		[visible]="isAddPopupVisible"
+		(closed)="onAddPopupClosed()"
+		(saved)="onAddPopupSaved()">
+	</app-finishes-add>
+
+	<dx-popup
+		[visible]="isUpdatePopupVisible"
+		[showTitle]="true"
+		title="Update Finish"
+		[width]="520"
+		[height]="420"
+		[dragEnabled]="true"
+		[showCloseButton]="true"
+		[hideOnOutsideClick]="false"
+		(onHiding)="onUpdatePopupClosed()">
+		<div *dxTemplate="let _ of 'content'">
+			<dx-form
+				[formData]="updateModel"
+				[colCount]="1"
+				[labelLocation]="'left'"
+				[showColonAfterLabel]="false">
+				<dxi-item dataField="state" editorType="dxSelectBox" [editorOptions]="{ items: stateOptions }" [label]="{ text: 'State' }"></dxi-item>
+				<dxi-item dataField="maxSpeedRun1" [label]="{ text: 'Max Speed Run 1' }"></dxi-item>
+				<dxi-item dataField="maxSpeedRun2" [label]="{ text: 'Max Speed Run 2' }"></dxi-item>
+				<dxi-item dataField="maxSpeedRun3" [label]="{ text: 'Max Speed Run 3' }"></dxi-item>
+			</dx-form>
+
+			<div class="finshes-edit-footer">
+				<dx-button icon="save" text="Save" stylingMode="outlined" (onClick)="onUpdatePopupSaved()"></dx-button>
+				<dx-button icon="close" text="Cancel" stylingMode="outlined" (onClick)="onUpdatePopupClosed()"></dx-button>
+			</div>
+		</div>
+	</dx-popup>
+</div>

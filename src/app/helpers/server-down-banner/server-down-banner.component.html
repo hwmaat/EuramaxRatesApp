@@ -1,0 +1,21 @@
+@if (!globals.serverAvailable()) {
+  <div class="server-down-banner">
+    <div class="text">
+      <strong>Server not available</strong>
+      <span>The backend server is not reachable. Please check if it is running.</span>
+    </div>
+    <div class="actions">
+      <dx-button
+        text="Retry"
+        type="default"
+        stylingMode="contained"
+        (onClick)="retry()">
+      </dx-button>
+      <dx-button
+        text="Dismiss"
+        stylingMode="text"
+        (onClick)="dismiss()">
+      </dx-button>
+    </div>
+  </div>
+}

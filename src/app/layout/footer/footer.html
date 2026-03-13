@@ -1,0 +1,26 @@
+
+<footer class="footer-container">
+  <div class="footerdiv">
+    <div class="left">©{{ currentYear }} H.W. Maat - Amsline v{{version}}
+<!--       Hub consumers: {{ consumers$ | async }} -->
+    </div>
+    <div class="center">
+      @if (auth.status() === 'authenticated') {
+        <span class="username">Api key found</span>
+      } @else {
+        <span class="username">Api key not found</span>
+      }
+    </div>
+    <div class="right">
+      <dx-switch
+        [value]="!themeValue"
+        (onValueChanged)="themeChange($event.value)"
+        switchedOnText="Dark"
+        switchedOffText="Light">
+      </dx-switch>
+    </div> 
+    <div class="righttest">
+      {{ baseUrl }} 
+    </div>
+  </div>
+</footer>

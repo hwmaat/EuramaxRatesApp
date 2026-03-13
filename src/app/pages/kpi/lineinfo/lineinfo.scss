@@ -1,0 +1,215 @@
+.card-menu-button {
+  ::ng-deep .dx-button-content {
+    padding: 4px;
+    font-size: 16px;
+  }
+}
+
+.kpi-card {
+  position: relative;
+  width: 260px;
+  height: 250px;
+  padding: 0px 10px 6px 5px;
+  margin: 4rem 0.5rem 0.5rem 2.5rem;
+  background-color: var(--card-bg);
+  border-left: 5px solid var(--accent-color);
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    transform: translateY(-4px);
+    background-color: var(--card-hover);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; // label left, button right
+    margin-bottom: 0.5rem;
+
+    .card-actions-wrapper {
+      display: flex;
+      align-items: center;
+      .card-label {
+        font-size: 32px;
+        font-weight: 600;
+        margin-top: 0;
+        color: green;
+
+        &.is-running {
+          color: green;
+        }
+
+        &.is-stop {
+          color: red;
+        }
+      }
+    }
+  }
+
+  .card-content {
+    text-align: left;
+    margin-top: 0.5rem;
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 500;
+    }
+
+    .card-value {
+      font-size: 1.6rem;
+      font-weight: bold;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      border:1px solid white;
+      .label {
+        font-weight: 400;
+        margin-right: 6px;
+        font-size: 1.4rem;
+        color: var(--text-color);
+        display: flex;
+        flex: auto;
+        flex-direction: column;
+        justify-content: center;
+        text-align: end;
+      }
+      .value {
+        font-size: 1.6rem;
+        font-weight: bold;
+        color: green;
+      }
+    }
+  }
+}
+
+.card-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.6); // adjust for dark theme if needed
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.kpi-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.kpi-row-meters {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  margin-top: 8px;
+}
+.kpi-label {
+  font-size: 13px;
+}
+
+.kpi-value {
+  font-weight: 600;
+  text-align: right;
+  min-width: 24px;
+}
+
+.kpi-label-l{
+  font-size: 20px;
+  color: yellowgreen;
+
+  &.is-running {
+    color: yellowgreen;
+  }
+
+  &.is-stop {
+    color: red;
+    animation: meter-alert 1s steps(1, end) infinite;
+  }
+}
+.kpi-label-v{
+  font-size: 20px;
+  text-align: right;
+  color: yellowgreen;
+  font-weight:900;
+
+  &.is-running {
+    color: yellowgreen;
+  }
+
+  &.is-stop {
+    color: red;
+    animation: meter-alert 1s steps(1, end) infinite;
+  }
+}
+
+.kpi-progress {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.kpi-progress-track {
+  position: relative;
+  width: 100%;
+  height: 0.5rem;
+  border-radius: 999px;
+  background-color: rgba(255, 255, 255, 0.15);
+  overflow: hidden;
+}
+
+.kpi-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #4caf50, #81c784);
+  transition: width 0.3s ease;
+
+  &.is-stop {
+    background: linear-gradient(90deg, #f87171, #ef4444);
+  }
+}
+
+.kpi-progress-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-align: right;
+  color: var(--text-color);
+
+  &.is-stop {
+    color: #ef4444;
+  }
+}
+
+@keyframes meter-alert {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kpi-label-l.is-stop,
+  .kpi-label-v.is-stop {
+    animation: none;
+  }
+}

@@ -1,0 +1,157 @@
+<dx-popup
+	[visible]="visible()"
+	[showTitle]="true"
+	title="Finish Details"
+	[width]="960"
+	[height]="'auto'"
+    [maxHeight]="'100vh'"
+	[dragEnabled]="true"
+	[hideOnOutsideClick]="true"
+	[showCloseButton]="true"
+    [resizeEnabled]="true"
+	(onHiding)="handleClose()">
+
+	<div *dxTemplate="let _ of 'content'">
+		<ams-load-panel
+			[visible]="loading()"
+			[message]="'loading....'"
+			[shading]="true"
+			[shadingColor]="'rgba(0,0,0,0.4)'">
+		</ams-load-panel>
+
+		<div class="finish-details-body">
+			@if (errorMessage()) {
+				<p class="finish-details-error">{{ errorMessage() }}</p>
+			} @else {
+				<div class="popup-content-container dx-card">
+					<dx-form
+						[formData]="form()"
+                        [ngClass] = "'formclass'"
+                        [alignItemLabelsInAllGroups] = "false"
+						[labelLocation]="'left'"
+						[colCount]="1"
+						[showColonAfterLabel]="false"
+						[readOnly]="false">
+						<dxi-item itemType="group" [colCount]="2" caption="" cssClass="firstlevel">
+							<dxi-item dataField="id" [label]="{ text: 'Id' }"></dxi-item>
+							<dxi-item dataField="finishCode" [label]="{ text: 'Finish Code' }"></dxi-item>
+							<dxi-item dataField="version" [label]="{ text: 'Version' }"></dxi-item>
+							<dxi-item dataField="state" [label]="{ text: 'State' }"></dxi-item>
+                            <dxi-item dataField="paintLine" [label]="{ text: 'Paint Line' }"></dxi-item>
+						</dxi-item>
+						<dxi-item itemType="group" [colCount]="2" caption="Customer" cssClass="firstlevel">
+							<dxi-item dataField="customer" [label]="{ text: 'Customer' }"></dxi-item>
+							<dxi-item dataField="customerNumber" [label]="{ text: 'Customer Number' }"></dxi-item>
+							
+						</dxi-item>
+						<dxi-item itemType="group" [colCount]="2" caption="Surface" cssClass="firstlevel">
+							<dxi-item dataField="substrate" [label]="{ text: 'Substrate' }"></dxi-item>
+							<dxi-item dataField="surfaceTreatment" [label]="{ text: 'Surface Treatment' }"></dxi-item>
+							<dxi-item dataField="surfaceQuality" [label]="{ text: 'Surface Quality' }"></dxi-item>
+							<dxi-item dataField="preTreatment" [label]="{ text: 'Pre Treatment' }"></dxi-item>
+						</dxi-item>
+						<dxi-item itemType="group" [colCount]="3" caption="Runs" cssClass="firstlevel">
+							<dxi-item dataField="runs" [label]="{ text: 'Runs' }"></dxi-item>
+							<dxi-item dataField="side" [label]="{ text: 'Side' }"></dxi-item>
+							<dxi-item dataField="layerCount" [label]="{ text: 'Paint Layers' }"></dxi-item>
+                            <dxi-item dataField="maxSpeedRun1" [label]="{ text: 'Max Speed Run 1' }"></dxi-item>
+							<dxi-item dataField="maxSpeedRun2" [label]="{ text: 'Max Speed Run 2' }"></dxi-item>
+							<dxi-item dataField="maxSpeedRun3" [label]="{ text: 'Max Speed Run 3' }"></dxi-item>
+							
+						</dxi-item>
+					</dx-form>
+
+					<div class="finish-details-layers">
+						<dx-data-grid
+							[dataSource]="paintLayerRows()"
+							keyExpr="id"
+							[showBorders]="true"
+							[showColumnLines]="true"
+							[rowAlternationEnabled]="false"
+							[hoverStateEnabled]="false"
+                            [focusedRowEnabled]="false"
+                            [groupPanel]='{ visible: false}'
+                            [searchPanel]='{ visible: false}'
+                            >
+							<dxi-column caption="Paint Layers" cellTemplate="paintLayerTemplate"></dxi-column>
+
+							<div *dxTemplate="let data of 'paintLayerTemplate'">
+								<div class="finish-layer-row">
+									<div class="finish-layer-line">
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Layer</span>
+											<span class="finish-layer-value">{{ data.data?.layerNumber }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Side</span>
+											<span class="finish-layer-value">{{ data.data?.side }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Paint Code</span>
+											<span class="finish-layer-value">{{ data.data?.paintCode }}</span>
+										</span>
+										<span class="finish-layer-item finish-layer-span-2">
+											<span class="finish-layer-label">Paint Description</span>
+											<span class="finish-layer-value">{{ data.data?.paintDescription }}</span>
+										</span>
+									</div>
+									<div class="finish-layer-line">
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Thickness</span>
+											<span class="finish-layer-value">{{ data.data?.layerThickness }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Paint System</span>
+											<span class="finish-layer-value">{{ data.data?.paintSystem }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Manufacturer</span>
+											<span class="finish-layer-value">{{ data.data?.manufacturer }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Metallic</span>
+											<span class="finish-layer-value">{{ data.data?.metallicType }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Non White</span>
+											<span class="finish-layer-value">{{ data.data?.nonWhite }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Alu Natur</span>
+											<span class="finish-layer-value">{{ data.data?.aluNatur }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Volume Fraction</span>
+											<span class="finish-layer-value">{{ data.data?.volumeFractionOfSolid }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Primer</span>
+											<span class="finish-layer-value">{{ data.data?.isPrimer }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Wrinkle</span>
+											<span class="finish-layer-value">{{ data.data?.isWrinkle }}</span>
+										</span>
+										<span class="finish-layer-item">
+											<span class="finish-layer-label">Clear Coat</span>
+											<span class="finish-layer-value">{{ data.data?.isTransparentOrClearCoat }}</span>
+										</span>
+									</div>
+								</div>
+							</div>
+						</dx-data-grid>
+					</div>
+                        <div class="footer">
+                            <div class="footer-buttons">
+                            <dx-button icon="save" text="Save" stylingMode="outlined" 
+                            hint =""  (onClick)="onSave()"></dx-button>
+                            <dx-button icon="close" text="Cancel" stylingMode="outlined" (onClick)="onCancel()"></dx-button>
+                            </div>
+                        </div>
+
+				</div>
+			}
+		</div>
+
+	</div>
+</dx-popup>

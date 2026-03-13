@@ -1,0 +1,19 @@
+import { Routes } from '@angular/router';
+import { bootstrapGuard } from '@app/guards/bootstrap.guard';
+import { authGuard } from '@app/guards/auth.guard';
+
+import { Home } from './layout/home/home';
+import { AuthenticationFailed } from './authentication-failed/authentication-failed';
+import { Bootstrap } from './bootstrap/bootstrap';
+import { Login } from './login/login';
+
+export const routes: Routes = [
+  { path: '', component: Bootstrap, canActivate: [bootstrapGuard], pathMatch: 'full', data: { caption: '' } },
+
+  { path: 'login', component: Login, data: { caption: 'Login' } },
+  { path: 'home', component: Home, canActivate: [authGuard], data: { caption: 'Home' } },
+  { path: 'authentication-failed', component: AuthenticationFailed, data: { caption: 'Authentication Failed' } },
+  { path: 'basedata', canActivate: [authGuard], loadChildren: () => import('./pages/basedata/basedata.routes').then(m => m.routes) },
+  { path: 'planning', canActivate: [authGuard], loadChildren: () => import('./pages/planning/planning.routes').then(m => m.routes) },
+  { path: '**', redirectTo: '' }
+];

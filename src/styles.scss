@@ -1,0 +1,223 @@
+/* You can add global styles to this file, and also import other style files */
+@use "./styles-gridscreen";
+@use "./style-toolbar";
+/* DevExtreme theme is loaded dynamically via index.html theme links */
+
+/* Global layout helpers */
+html, body, app-root { height: 100%; }
+body { margin: 0; }
+
+
+.light-theme {
+  --edit-bg: whitesmoke  ;
+  --edit-text: #000;
+  --edit-border: #ccc;
+  --toolbar-bg: #008671;
+  --toolbar-hover-bg: black;
+  --toolbar-hover-text: yellow;
+  --card-bg: #f9f9f9;
+  --card-hover: #f1f1f1;
+  --accent-color: #1976d2;
+  --form-background: whitesmoke;
+  --footer-color:darkgrey;
+  --footer-bg:#008671;
+  --grid-header-bg: #f1f1f1;
+  --grid-header-text: #333;
+  --top-frame-backcolor:#008671;
+  --top-frame-color:#ffffff;
+  --menu-left-bg:whitesmoke;
+  --small-icon-color:#d95f2b;
+  --grid-baancolumn-color: #008671;
+  --grid-client-column-color: green;
+  --grid-summary-color: darkblue;
+  --info-bg: #eef6fd;
+  --info-accent: #4da3ff;
+  --info-text: #1b4f8c;
+
+  --warning-bg: #fff4e5;
+  --warning-accent: #f0ad4e;
+  --warning-text: #7a4a00;
+
+  --error-bg: #fdecea;
+  --error-accent: #d9534f;
+  --error-text: #7a1b1b;  
+
+    --ams-grid-detail-surface: #f5f7fa;
+    --ams-grid-detail-border: #d9e2ec;
+    --ams-grid-detail-label: #243b53;
+    --ams-grid-detail-value: #102a43;
+    --ams-grid-detail-subtitle: #243b53;
+    --ams-grid-detail-muted: #52606d;
+    --ams-grid-detail-title: #102a43;
+    
+}
+
+
+.dark-theme {
+  --edit-bg: black;
+  --edit-text: #fff;
+  --edit-border: #444;
+  --toolbar-bg:  #008671;
+  --toolbar-hover-bg: black;
+  --toolbar-hover-text: yellow;
+  --card-bg: #1e1e1e;
+  --card-hover: #2c2c2c;
+  --accent-color: #90caf9;
+  --form-background: black;
+  --footer-color:whitesmoke;
+  --footer-bg:#008671;
+  --grid-header-bg: #00312a;
+  --grid-header-text: #fff;
+  --top-frame-backcolor:#008671;
+  --top-frame-color:#ffffff;
+  --menu-left-bg:black;
+  --small-icon-color:#d95f2b;
+  --grid-baancolumn-color: aqua;
+  --grid-client-column-color: wheat;
+  --grid-summary-color: wheat;
+  --info-bg: #1f2f3f;
+  --info-accent: #4da3ff;
+  --info-text: #cfe6ff;
+
+  --warning-bg: #3a2f1a;
+  --warning-accent: #f0ad4e;
+  --warning-text: #ffe0a3;
+
+  --error-bg: #3a1d1d;
+  --error-accent: #ff6b6b;
+  --error-text: #ffd6d6;
+
+  --ams-grid-detail-surface: #1e1e1e;
+  --ams-grid-detail-border: #444444;
+  --ams-grid-detail-label: burlywood;
+  --ams-grid-detail-value: #ffffff;
+  --ams-grid-detail-subtitle: #bbbbbb;
+  --ams-grid-detail-muted: #777777;
+  --ams-grid-detail-title: #ffffff;
+  
+}
+
+/* Datagrid =============================================================== */
+ #gridContainer {
+   height:100%;
+    width:100%;
+
+    .small-button {
+      font-size: 12px !important;
+      height: 16px !important;    
+    }
+      .dx-button.small-icon {
+        font-size: 12px !important;
+        width: 16px !important;
+        height: 16px !important;
+        background-color: transparent;
+        color:var(--small-icon-color)!important;
+    }
+      .dx-button.small-iconb {
+        font-size: 12px !important;
+        width: 16px !important;
+        height: 16px !important;
+        background-color: transparent;
+        
+    }
+      .dx-button.small-iconc {
+        font-size: 12px !important;
+        width: 16px !important;
+        height: 16px !important;
+        background-color: transparent;
+        
+    }
+  }
+.dx-datagrid .dx-header-row > td {
+    background-color: var(--grid-header-bg);
+    font-weight: bold;
+    font-size: 13px;
+}
+// .dx-datagrid-rowsview .dx-row.dx-state-hover {
+//   background-color: rgba(204, 152, 55, 0.15) !important;
+// }
+
+// .dx-datagrid-rowsview .dx-row.dx-state-hover > td {
+//   border-top: none !important;
+//   border-bottom: none !important;
+//   padding-top: inherit !important;
+//   padding-bottom: inherit !important;
+//   background-color: rgba(204, 152, 55, 0.15) !important;
+// }
+
+  .informer {
+    margin-top: 2px;
+    margin-bottom: 1px;
+    color: var(--edit-text);
+    font-size:16px;
+    font-weight: 700;
+    
+  }
+  .infcheckbox >div {
+    font-size: 12px !important;
+    display: flex;
+    align-items: center;
+    margin-left:5px;
+  }
+  .dx-toolbar-label.infcheckbox .dx-toolbar-item-content > div {
+    margin-right: 5px;
+    margin-bottom: 2px;
+  }
+  
+  .dx-switch{
+    height:20px !important;
+  }
+
+ .dx-edit-row .dx-editor-cell .dx-texteditor{
+    background-color: var(--edit-bg);
+    color: var(--edit-text);
+  }
+
+::ng-deep .dx-datagrid .dx-row>td {
+  line-height:0 !important;
+}
+
+
+  /* forms ============================================================== */
+.formclass {
+  padding: 12px !important;
+  background-color: var(--form-background) !important;
+}
+
+.dx-layout-manager .dx-field-item{
+  padding-bottom:1px !important;
+}
+
+.dx-form-group-caption {
+  font-weight: 400;
+  font-size: 16px;
+  color: goldenrod;
+  width: 100%;
+  display: block;
+  padding-top:1px;
+  border-radius: 0;
+  border-top: 0 solid darkgrey;
+}
+
+.dx-form-group-with-caption > .dx-form-group-content {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  border-top: 0 solid #515159;
+}
+
+.firstlevel .dx-form-group-caption {
+  border-top: 0 solid darkgray;
+}
+.secondlevel .dx-form-group-caption {
+  border-top: 0 solid darkgray;
+}
+
+.dx-field-item:not(.dx-field-item-has-group, .dx-field-item-has-tabs, .dx-label-v-align) {
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+
+.dx-icon-save:before {
+    color: #00aeff !important;
+}
+

@@ -1,0 +1,50 @@
+.error-panel {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 380px;
+  max-width: calc(100vw - 32px);
+  padding: 12px 14px;
+  border-radius: 6px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.2);
+  z-index: 2000;
+
+  .error-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      i {
+        font-size: 18px;
+      }
+    }
+  }
+
+  .error-message {
+    margin-top: 8px;
+    line-height: 1.4;
+  }
+  &.info {
+    background: var(--info-bg);
+    border-left: 4px solid var(--info-accent);
+    color: var(--info-text);
+  }
+
+  &.warning {
+    background: var(--warning-bg);
+    border-left: 4px solid var(--warning-accent);
+    color: var(--warning-text);
+  }
+
+  &.error {
+    background: var(--error-bg);
+    border-left: 4px solid var(--error-accent);
+    color: var(--error-text);
+  }
+}

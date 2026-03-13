@@ -1,0 +1,26 @@
+<section class="login-page">
+  <div class="login-card">
+    <h1>Sign in</h1>
+    <p>Enter your API key to continue.</p>
+
+    <form (ngSubmit)="submit()">
+      <label for="apiKey">API key</label>
+      <input
+        id="apiKey"
+        name="apiKey"
+        type="password"
+        [(ngModel)]="apiKey"
+        autocomplete="off"
+        required
+      />
+
+      @if (errorMessage()) {
+        <div class="error">{{ errorMessage() }}</div>
+      }
+
+      <button type="submit" [disabled]="!canSubmit()">
+        {{ submitting() ? 'Signing in...' : 'Sign in' }}
+      </button>
+    </form>
+  </div>
+</section>

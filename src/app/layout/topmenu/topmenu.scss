@@ -1,0 +1,21 @@
+
+  
+  .menu-text {
+    font-size: 14px;
+    margin-right: 10px;
+  }
+
+   ::ng-deep .dx-menu .dx-menu-item {
+    color: white!important;
+    font-weight: 500;
+    font-size: 14px;
+    background-color: var(--toolbar-bg)!important; //#006f5c!important;
+  } 
+
+ ::ng-deep .dx-menu .dx-menu-item:hover {
+    color: var(--toolbar-hover-text)!important; //blueviolet!important;
+    font-weight: 500;
+    font-size: 14px;
+    background-color: black!important; 
+  } 
+

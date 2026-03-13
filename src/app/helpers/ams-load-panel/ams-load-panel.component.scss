@@ -1,0 +1,51 @@
+.ams-load-panel-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1501; /* Higher than dx-load-panel's default z-index */
+  pointer-events: none;
+}
+
+.ams-load-panel-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 20px;
+  z-index: 1502;
+  pointer-events: auto;
+  min-width: 200px;
+  text-align: center;
+  margin-top: 60px; /* Offset below the dx-load-panel spinner */
+}
+
+.ams-load-panel-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.ams-load-panel-message {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin: 0;
+  white-space: nowrap;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .ams-load-panel-overlay {
+    background: #2d2d2d;
+    color: #fff;
+  }
+  
+  .ams-load-panel-message {
+    color: #fff;
+  }
+}

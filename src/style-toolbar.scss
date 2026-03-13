@@ -1,0 +1,83 @@
+  /* Toolbars ============================================================== */
+
+  .dx-toolbar .dx-toolbar-items-container{
+    height: 50px!important;
+  }
+  
+  .ams-toolbar {
+    width:calc(100%);
+    border-bottom: 2px solid grey;
+    padding-top: 5px;
+    padding-right: 10px;
+    
+    h3{
+      margin-top: 5px;
+      color: yellowgreen;
+      //background-color: black;
+      padding: 5px;
+      //border-radius: 10px;
+      // box-shadow: 2px 2px 5px gray;
+      //          position: relative;
+         top: -10px;
+    }
+  }
+  
+
+
+.toolPanelitem {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: baseline;
+    gap:5px;
+}
+.toolbar-item-container {
+  display: flex;
+  flex-direction: row;
+  align-items: baseline;
+  margin-left: 25px;
+  .toolbar-label {
+    margin-right: 15px;
+  };
+  .toolbar-label-AI {
+    margin-right: 15px;
+    color: greenyellow;
+    font-size: 18px;
+    font-weight: bold;
+  };
+}
+.toolPanel-field-label {
+  float: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width:250px;
+  min-width:25px;
+  white-space: nowrap;
+  cursor: default;
+  padding: 4px 5px 9px 10px;
+  font-weight: bold;
+}
+
+.dx-button-mode-text .dx-icon {
+  color:var(--dx-color-primary) !important;
+  font-size: 20px!important;
+}
+
+ .dx-button-mode-text.small-iconb .dx-icon {
+    font-size: 20px !important;
+    width: 16px !important;
+    height: 16px !important;
+    color:var(--top-frame-backcolor)!important;
+}
+
+ .dx-button-mode-text.small-iconc .dx-icon {
+    font-size: 20px !important;
+    width: 16px !important;
+    height: 16px !important;
+    color: yellowgreen !important;
+}
+
+.dx-icon-trash:before {
+    
+    color: red!important;
+}

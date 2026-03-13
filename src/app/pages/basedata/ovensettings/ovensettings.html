@@ -1,0 +1,106 @@
+<div class="em-container">
+  <ams-load-panel
+    [visible]="loading"
+    [message]="loadingMessage"
+    [shading]="true"
+    [shadingColor]="'rgba(0,0,0,0.4)'"
+  ></ams-load-panel>
+
+   <dx-toolbar class = "ams-toolbar">
+    <dxi-item location="before">
+      <div class="toolbar-title"></div>
+    </dxi-item>
+    </dx-toolbar>
+
+      <dx-data-grid
+    #gridContainer
+    id='gridContainer'
+    [dataSource]="records"
+    keyExpr="id"
+    [focusedRowEnabled]="true"
+    [hoverStateEnabled]="true"
+    (onExporting)="onExporting($event, 'OvenSettings')"
+    (onToolbarPreparing)="onToolbarPreparing($event)"
+    (onEditingStart)="onEditingStart($event)"
+    (onInitNewRow)="onInitNewRow($event)"
+    (onEditorPreparing)="onEditorPreparing($event)"
+    (onRowUpdating)="rowUpdating($event)"
+    (onRowInserting)="rowInserting($event)"
+    (onRowRemoving)="onRowRemoving($event)"
+    (onRowInserted)="onRowInserted($event)"
+    (onSelectionChanged)="onSelectionChanged($event)"
+    (onEditCanceled)="ResetEdit()"
+    [cellHintEnabled]="true"
+    >
+    <dxo-scrolling rowRenderingMode="virtual"> </dxo-scrolling>
+    <dxo-selection [mode]="selectionMode" showCheckBoxesMode="onClick" selectAllMode="page" allowSelectAll="true"> </dxo-selection>
+    <dxo-editing
+      mode="row"
+      [allowUpdating]="true"
+      [allowDeleting]="false"
+      [allowAdding]="true"
+      [useIcons]="false"
+      [confirmDelete]="false"
+    >
+      <dxo-popup [title]="'Add Oven Setting'" [showTitle]="true" [width]="700" [height]="550"></dxo-popup>
+      <dxo-form>
+        <dxi-item dataField="paintLine" editorType="dxSelectBox" [editorOptions]="paintLineEditorOptions"></dxi-item>
+        <dxi-item dataField="thickness"></dxi-item>
+        <dxi-item dataField="lineSpeed"></dxi-item>
+        <dxi-item dataField="zone1"></dxi-item>
+        <dxi-item dataField="zone2"></dxi-item>
+        <dxi-item dataField="zone3"></dxi-item>
+        <dxi-item dataField="substrate" editorType="dxSelectBox" [editorOptions]="substrateEditorOptions"></dxi-item>
+        <dxi-item dataField="state" editorType="dxSelectBox" [editorOptions]="stateEditorOptions"></dxi-item>
+      </dxo-form>
+    </dxo-editing>
+    <dxo-paging [enabled]="true" [pageSize]="pageSize"> </dxo-paging>
+    <dxo-pager
+      [visible]="true" [showPageSizeSelector]="true" [showInfo]="true" [showNavigationButtons]="true"
+      [allowedPageSizes]="[5, 10, 15, 20, 25, 100]"
+      [displayMode]="'full'">
+    </dxo-pager>
+
+  <dxi-column type="buttons" [visible]="false"></dxi-column>
+    <dxi-column caption="action" [width]="125" cellTemplate="buttonrowtemplate" [fixed]="true" fixedPosition="left"></dxi-column>
+    <dxi-column dataField="id" caption="id#" [width]="75" [allowEditing]="false"></dxi-column>
+    <dxi-column dataField="paintLine" caption="paintLine" [width]="85"></dxi-column>
+    <dxi-column dataField="thickness" caption="thickness" [width]="85" dataType="number" [format]=fixedformat2 alignment="right"></dxi-column>
+    <dxi-column dataField="lineSpeed" caption="lineSpeed" [width]="85" dataType="number" format="#,##0" alignment="right"></dxi-column>
+    <dxi-column dataField="zone1"  caption="zone1" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true"></dxi-column>
+    <dxi-column dataField="zone2"  caption="zone2" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true"></dxi-column>
+    <dxi-column dataField="zone3"  caption="zone3" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true"></dxi-column>
+    <dxi-column dataField="substrate"  caption="substrate" [width]="85"></dxi-column>
+    <dxi-column dataField="state"  caption="state" [width]="95">
+      <dxo-lookup [dataSource]="stateOptions"></dxo-lookup>
+    </dxi-column>
+    <dxi-column dataField="" width="100%" caption=""></dxi-column>  
+
+    <div  *dxTemplate="let data of 'buttonrowtemplate'">
+      <div class="button-column">
+        <dx-button icon = "edit" hint = "edit Order data" stylingMode="text" (onClick)= "EditRecord(data)" class="small-icon" [visible]="!(data.row.isEditing)"></dx-button>
+        <dx-button icon = "trash" hint = "delete record" stylingMode="text" (onClick)="DeleteRecord(data)" class="small-icon" [visible]="!(data.row.isEditing)"></dx-button>          
+        <dx-button icon = "revert" stylingMode="text" (onClick)= "CancelEdit(data)" class="small-icon" [visible]="data.row.isEditing"></dx-button>
+        <dx-button icon = "save" stylingMode="text" (onClick)= "SaveRecord(data)" class="small-icon" [visible]="data.row.isEditing"></dx-button>
+      </div>
+    </div>
+    <div *dxTemplate="let data of 'statusTemplate'">
+      <span [ngClass]="(data.data?.status ?? '').toLowerCase() === 'error' ? 'status-error' : 'status-ok'">
+        {{ data.data?.status }}
+      </span>
+    </div>
+
+
+
+    <dxo-summary>
+      <dxi-group-item
+        summaryType="count"
+        displayFormat="{0}"
+        [showInGroupFooter]="false">
+      </dxi-group-item>
+    </dxo-summary>
+  </dx-data-grid>
+
+
+
+</div>

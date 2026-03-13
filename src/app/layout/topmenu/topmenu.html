@@ -1,0 +1,15 @@
+<dx-menu
+  [items]="items$ | async"
+  displayExpr="text"
+  [orientation]="'horizontal'"
+  cssClass="toolbarColor"
+  itemTemplate="items"
+  showFirstSubmenuMode="onHover"
+  showSubmenuMode="onHover"
+  (onItemClick)="onMenuItemClick($event)">
+  <div *dxTemplate="let itemData of 'items'">
+    <span class="menu-text"> @if (itemData.icon) {
+      <span class="mdi {{itemData.icon}} menu-icon"></span>
+    } {{itemData.text}}</span>
+  </div>
+</dx-menu>
