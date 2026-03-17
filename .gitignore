@@ -41,3 +41,7 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# App config files
+/src/assets/config.dev.json
+/src/assets/config.prod.json
