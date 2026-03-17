@@ -1,4 +1,4 @@
-import { Component, effect, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 
 import { DxSwitchModule, DxButtonModule } from 'devextreme-angular';
 import { signal } from '@angular/core';

@@ -1,4 +1,4 @@
-import { Component, computed, EventEmitter, inject, Output } from '@angular/core';
+import { Component, computed, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { DxButtonModule } from 'devextreme-angular';
 import { Topmenu } from '../topmenu/topmenu';
 import { WithDestroy } from '@app/helpers/WithDestroy';
@@ -6,6 +6,11 @@ import { Router, NavigationEnd } from '@angular/router';
 import { Globals } from '@app/services/globals.service';
 import { filter, map, switchMap, of, takeUntil } from 'rxjs';
 import { HeaderService } from '@app/services/header.service';
+import { MenuClickEvent } from '@app/models/menu-events.model';
+
+interface HeaderRouteData {
+  caption?: string;
+}
 
 @Component({
   selector: 'app-header',
@@ -14,7 +19,7 @@ import { HeaderService } from '@app/services/header.service';
   templateUrl: './header.html',
   styleUrls: ['./header.scss']
 })
-export class Header extends WithDestroy() {
+export class Header extends WithDestroy() implements OnInit {
   @Output() toggleMenu = new EventEmitter<void>();
   
   private headerService = inject(HeaderService);
@@ -44,12 +49,12 @@ export class Header extends WithDestroy() {
       }),
       switchMap(route => route.data ?? of({})),
       takeUntil(this.destroy$)
-    ).subscribe((data: any) => {
+    ).subscribe((data: HeaderRouteData) => {
       const txt = data?.caption ? ` - ${data.caption}` : this.headerService.defaultCaption;
       this.headerService.setCaption(txt);
     });
   }
-    onMenuItemClick(e: any) {
+    onMenuItemClick(e: MenuClickEvent) {
     const item = e.itemData;
     if (item.path !== undefined) {
       this.router.navigateByUrl(item.path);

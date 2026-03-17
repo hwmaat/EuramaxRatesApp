@@ -3,8 +3,8 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { AmsLoadPanelComponent } from '@app/helpers/ams-load-panel/ams-load-panel.component';
 import { BaseGrid } from '@app/helpers/basegrid';
 import { EditMode } from '@app/models/enum';
+import { DeleteRecordEvent, InlineEditEvent, RowRemovingEvent, SelectionChangedEvent } from '@app/models/grid-events.model';
 import { DxButtonModule, DxDataGridModule, DxToolbarModule } from 'devextreme-angular';
-import notify from 'devextreme/ui/notify';
 import { firstValueFrom } from 'rxjs';
 import { confirm } from 'devextreme/ui/dialog';
 import { MetalSpecificationDto } from '@app/models/metalspecifications.model';
@@ -43,21 +43,21 @@ selectedRowKeys: number[] = [];
     this.showTreeButton=true;
     this.editInline = true;
  }
-  public override refresh(e: any): void {
+   public override refresh(): void {
     this.records = [];
     const spParams = new Map();
     this.loadDataDirect(spParams);
   }
 
-  onSelectionChanged(e: any) {
-    this.selectedRowKeys = e.selectedRowKeys;
+  onSelectionChanged(e: SelectionChangedEvent) {
+    this.selectedRowKeys = e.selectedRowKeys ?? [];
   }
-  onRowRemoving(e:any){
+  onRowRemoving(e: RowRemovingEvent){
        const spParams = new Map();
           spParams.set('id', e.key);  
-          let result = firstValueFrom(this.api.delete(this.entityEndpoint,spParams));
+          const result = firstValueFrom(this.api.delete(this.entityEndpoint,spParams));
           e.cancel = new Promise<boolean>((resolve, reject) => {
-            result.then((result) => {
+            result.then(() => {
             resolve(false);
             })
               .catch((err) => {
@@ -71,15 +71,15 @@ selectedRowKeys: number[] = [];
       this.editMode = EditMode.Read;
   }
 
-  SaveRecord = (e: any) => {
+  SaveRecord = (_e?: unknown) => {
     this.gridx.instance.saveEditData();
   }
-  public override addRecord(e: any): void {
+  public override addRecord(): void {
     this.editMode = EditMode.Add;
     this.gridx.instance.addRow();
   }
 
-  EditRecord = (e:any) => {
+  EditRecord = (e: InlineEditEvent) => {
     
     if (this.editInline){
       this.startInlineEdit(e);
@@ -89,15 +89,15 @@ selectedRowKeys: number[] = [];
     }
   }
 
-  startInlineEdit(e: any) {
+  startInlineEdit(e: InlineEditEvent) {
     const rowIndex = e.rowIndex;
     const grid = e.component;
     this.editMode = EditMode.Edit;
     grid.editRow(rowIndex);
   }
 
-  DeleteRecord = (e:any) => {
-     const result = confirm(`Are you sure you want to delete record #${e.data.id}?`, 'Confirm Delete');
+  DeleteRecord = (e: DeleteRecordEvent<{ id?: unknown }>) => {
+      const result = confirm(`Are you sure you want to delete record #${e.data?.id}?`, 'Confirm Delete');
      result.then((dialogResult) => {
        if (dialogResult) {
         this.editMode = EditMode.Delete;
@@ -106,7 +106,7 @@ selectedRowKeys: number[] = [];
        }
      });
   }
-  CancelEdit = (e: any) => {
+  CancelEdit = (_e?: unknown) => {
     this.gridx.instance.cancelEditData();
     this.editMode = EditMode.Read;
   }

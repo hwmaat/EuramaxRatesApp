@@ -3,7 +3,10 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "9c7f9eb7-3229-4317-98a3-14dbac8f1fee"
+    "analytics": "9c7f9eb7-3229-4317-98a3-14dbac8f1fee",
+    "schematicCollections": [
+      "angular-eslint"
+    ]
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -26,7 +29,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/assets/medialine16.ico",
-              "src/assets",     
+              "src/assets",
               {
                 "glob": "**/*",
                 "input": "public"
@@ -75,6 +78,15 @@
         },
         "test": {
           "builder": "@angular/build:unit-test"
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }

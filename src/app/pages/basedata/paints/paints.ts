@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { AmsLoadPanelComponent } from '@app/helpers/ams-load-panel/ams-load-panel.component';
 import { BaseGrid } from '@app/helpers/basegrid';
+import { SelectionChangedEvent } from '@app/models/grid-events.model';
 import { PaintDto, SpecMetrixExceptionDto } from '@app/models/paint.model';
 import { DxDataGridModule, DxToolbarModule } from 'devextreme-angular';
 
@@ -38,14 +39,14 @@ export class Paints extends BaseGrid<PaintDto> implements OnInit, AfterViewInit 
     this.editInline = false;
   }
 
-  public override refresh(e: any): void {
+  public override refresh(): void {
     this.records = [];
     const spParams = new Map();
     this.loadDataDirect(spParams);
   }
 
-  onSelectionChanged(e: any): void {
-    this.selectedRowKeys = e.selectedRowKeys;
+  onSelectionChanged(e: SelectionChangedEvent<number>): void {
+    this.selectedRowKeys = e.selectedRowKeys ?? [];
   }
 
   specMetrixExceptionCount = (data: PaintDto): number => {

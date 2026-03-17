@@ -12,12 +12,12 @@
 	(onHiding)="handleClose()">
 
 	<div *dxTemplate="let _ of 'content'">
-		<ams-load-panel
+		<app-ams-load-panel
 			[visible]="loading()"
 			[message]="'loading....'"
 			[shading]="true"
 			[shadingColor]="'rgba(0,0,0,0.4)'">
-		</ams-load-panel>
+		</app-ams-load-panel>
 
 		<div class="finish-details-body">
 			@if (errorMessage()) {

@@ -1,7 +1,7 @@
 // app/layout/menu.service.ts  (new file; adjust path to your structure)
 import { Injectable, inject } from '@angular/core';
 import { MenuItem, menuItems } from '@app/menu-items';
-import { map, of } from 'rxjs';
+import { of } from 'rxjs';
 import { AuthStateService } from './auth-state.service';
 
 

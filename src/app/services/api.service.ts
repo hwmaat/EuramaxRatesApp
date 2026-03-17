@@ -4,6 +4,9 @@ import { BehaviorSubject, catchError, filter, Observable, of, switchMap, take } 
 import { Globals } from "./globals.service";
 import { VersionInfoDto } from "@app/models/version.model";
 
+type ParamPrimitive = string | number | boolean;
+type ParamValue = ParamPrimitive | Date | null | undefined | Array<ParamPrimitive | Date | null | undefined>;
+
 
 @Injectable({ providedIn: 'root' })
 export class ApiService {
@@ -14,7 +17,6 @@ export class ApiService {
   constructor() {
     effect(() => {
       const url = this.globals.apiBaseUrl();
-      console.log('api.service ==> url', url);
       if (url) {
         this.baseUrl$.next(url.replace(/\/+$/, ''));
       }
@@ -27,21 +29,21 @@ export class ApiService {
       params: this.buildParams(spParams)
     });
   }
-  post<T>(endpoint: string, body: any, spParams?: Map<string, string>, options?: { headers?: HttpHeaders }) {
+  post<T>(endpoint: string, body: unknown, spParams?: Map<string, string>, options?: { headers?: HttpHeaders }) {
     return this.http.post<T>(this.buildUrl(endpoint), body, {
       params: this.buildParams(spParams),
       headers: options?.headers
     });
   }
 
-  put<T>(endpoint: string, body: any, spParams?: Map<string, string>, options?: { headers?: HttpHeaders }) {
+  put<T>(endpoint: string, body: unknown, spParams?: Map<string, string>, options?: { headers?: HttpHeaders }) {
     return this.http.put<T>(this.buildUrl(endpoint), body, {
       params: this.buildParams(spParams),
       headers: options?.headers
     });
   }
 
-  patch<T>(endpoint: string, body: any, spParams?: Map<string, string>, options?: { headers?: HttpHeaders }) {
+  patch<T>(endpoint: string, body: unknown, spParams?: Map<string, string>, options?: { headers?: HttpHeaders }) {
     return this.http.patch<T>(this.buildUrl(endpoint), body, {
       params: this.buildParams(spParams),
       headers: options?.headers
@@ -73,7 +75,7 @@ export class ApiService {
     return `${base}/${ep}`;
   }
 
-private buildParams(spParams?: Map<string, any>): HttpParams {
+private buildParams(spParams?: Map<string, ParamValue>): HttpParams {
   let params = new HttpParams();
 
   if (spParams) {
@@ -147,7 +149,7 @@ private buildParams(spParams?: Map<string, any>): HttpParams {
 
     getBackendVersion(): Observable<VersionInfoDto> {
     return this.baseUrlReady$.pipe(
-        switchMap(baseUrl => this.get<VersionInfoDto>(`version`))
+          switchMap(() => this.get<VersionInfoDto>(`version`))
     );
     }
 

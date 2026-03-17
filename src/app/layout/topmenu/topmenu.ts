@@ -3,6 +3,7 @@ import { Component, EventEmitter, inject, Output } from '@angular/core';
 import { RouterModule, Router } from '@angular/router';
 import { MenuService } from '@app/services/menu.service';
 import { DxMenuModule } from 'devextreme-angular';
+import { MenuClickEvent } from '@app/models/menu-events.model';
 
 @Component({
   selector: 'app-topmenu',
@@ -11,21 +12,19 @@ import { DxMenuModule } from 'devextreme-angular';
   styleUrl: './topmenu.scss',
 })
 export class Topmenu {
-  @Output() menuItemClick = new EventEmitter<any>();
+  @Output() menuItemClick = new EventEmitter<MenuClickEvent>();
   private router = inject(Router);
   private menuService = inject(MenuService);
   
   items$ = this.menuService.filteredMenuItems$;
 
-  onItemClick(e: any) {
-    console.log('topmenu ==> e', e);
+  onItemClick(e: MenuClickEvent) {
     if (e.itemData?.path) {
       this.router.navigateByUrl(e.itemData.path);
     }
   }
    
-  onMenuItemClick(e: any) {
-    console.log('topmenu ==> e', e);
+  onMenuItemClick(e: MenuClickEvent) {
     this.menuItemClick.emit(e);
   }
   

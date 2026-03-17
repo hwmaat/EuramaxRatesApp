@@ -3,6 +3,7 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { AmsLoadPanelComponent } from '@app/helpers/ams-load-panel/ams-load-panel.component';
 import { BaseGrid } from '@app/helpers/basegrid';
 import { EditMode } from '@app/models/enum';
+import { DeleteRecordEvent, InlineEditEvent, RowRemovingEvent, SelectionChangedEvent } from '@app/models/grid-events.model';
 import { PmtOffsetDto } from '@app/models/ovensetting.model';
 import { DxButtonModule, DxDataGridModule, DxToolbarModule } from 'devextreme-angular';
 import { confirm } from 'devextreme/ui/dialog';
@@ -42,17 +43,17 @@ export class Peakmetaltemp extends BaseGrid<PmtOffsetDto> implements OnInit, Aft
     this.editInline = true;
   }
 
-  public override refresh(e: any): void {
+  public override refresh(): void {
     this.records = [];
     const spParams = new Map();
     this.loadDataDirect(spParams);
   }
 
-  onSelectionChanged(e: any): void {
-    this.selectedRowKeys = e.selectedRowKeys;
+  onSelectionChanged(e: SelectionChangedEvent): void {
+    this.selectedRowKeys = e.selectedRowKeys ?? [];
   }
 
-  onRowRemoving(e: any): void {
+  onRowRemoving(e: RowRemovingEvent): void {
     const spParams = new Map();
     spParams.set(this.recordIdField, e.key);
     const result = firstValueFrom(this.api.delete(this.entityEndpoint, spParams));
@@ -72,29 +73,29 @@ export class Peakmetaltemp extends BaseGrid<PmtOffsetDto> implements OnInit, Aft
     this.editMode = EditMode.Read;
   }
 
-  SaveRecord = (e: any): void => {
+  SaveRecord = (_e?: unknown): void => {
     this.gridx.instance.saveEditData();
   }
 
-  public override addRecord(e: any): void {
+  public override addRecord(): void {
     this.editMode = EditMode.Add;
     this.gridx.instance.addRow();
   }
 
-  EditRecord = (e: any): void => {
+  EditRecord = (e: InlineEditEvent): void => {
     if (this.editInline) {
       this.startInlineEdit(e);
     }
   }
 
-  startInlineEdit(e: any): void {
+  startInlineEdit(e: InlineEditEvent): void {
     const rowIndex = e.rowIndex;
     const grid = e.component;
     this.editMode = EditMode.Edit;
     grid.editRow(rowIndex);
   }
 
-  DeleteRecord = (e: any): void => {
+  DeleteRecord = (e: DeleteRecordEvent<Record<string, unknown>>): void => {
     const recordId = e.data?.[this.recordIdField] ?? e.key;
     const result = confirm(`Are you sure you want to delete record #${recordId}?`, 'Confirm Delete');
     result.then((dialogResult) => {
@@ -106,7 +107,7 @@ export class Peakmetaltemp extends BaseGrid<PmtOffsetDto> implements OnInit, Aft
     });
   }
 
-  CancelEdit = (e: any): void => {
+  CancelEdit = (_e?: unknown): void => {
     this.gridx.instance.cancelEditData();
     this.editMode = EditMode.Read;
   }

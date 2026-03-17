@@ -30,7 +30,6 @@ export class Login {
     const settings = this.globals.settings();
 
     this.apiKey = settings.apiKey || '';
-    console.log('login ==> this.apiKey', this.apiKey);
     this.submitting.set(true);
     this.errorMessage.set(null);
 

@@ -6,13 +6,13 @@ import notify from 'devextreme/ui/notify';
 import { firstValueFrom } from 'rxjs';
 import { LookupsService } from '@app/services/lookups.service';
 
-type CreateLayerForm = {
+interface CreateLayerForm {
   layerNumber: number;
   paintCode: string;
   layerThickness: number;
-};
+}
 
-type CreateRecipeForm = {
+interface CreateRecipeForm {
   finishCode: string;
   paintLine: string;
   customerNumber: string;
@@ -27,7 +27,28 @@ type CreateRecipeForm = {
   maxSpeedRun3: number | null;
   state: string;
   paintLayers: CreateLayerForm[];
-};
+}
+
+interface CreateRecipePayload {
+  finishCode: string;
+  paintLine: string;
+  customerNumber: string;
+  substrate: string;
+  surfaceTreatment: string;
+  surfaceQuality: string;
+  preTreatment: string;
+  runs: number | null;
+  side: string;
+  maxSpeedRun1?: number;
+  maxSpeedRun2?: number;
+  maxSpeedRun3?: number;
+  state: string;
+  paintLayers: CreateLayerForm[];
+}
+
+interface InitNewLayerRowEvent {
+  data?: CreateLayerForm;
+}
 
 @Component({
   selector: 'app-finishes-add',
@@ -89,7 +110,7 @@ export class FinishesAdd {
       });
   }
 
-  onInitNewLayerRow(e: any): void {
+  onInitNewLayerRow(e: InitNewLayerRowEvent): void {
     e.data = {
       layerNumber: (this.model.paintLayers?.length ?? 0) + 1,
       paintCode: '',
@@ -116,7 +137,7 @@ export class FinishesAdd {
     };
   }
 
-  private toCreatePayload(source: CreateRecipeForm): any {
+  private toCreatePayload(source: CreateRecipeForm): CreateRecipePayload {
     const maxSpeedRun1 = this.normalizeOptionalSpeed(source.maxSpeedRun1);
     const maxSpeedRun2 = this.normalizeOptionalSpeed(source.maxSpeedRun2);
     const maxSpeedRun3 = this.normalizeOptionalSpeed(source.maxSpeedRun3);

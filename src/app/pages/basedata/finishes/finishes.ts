@@ -3,14 +3,15 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { AmsLoadPanelComponent } from '@app/helpers/ams-load-panel/ams-load-panel.component';
 import { BaseGrid } from '@app/helpers/basegrid';
 import { EditMode } from '@app/models/enum';
-import { FinishDto, FinishPaintLayerDto, FinishPaintDto, FinishPaintSystemDto, ManufacturerDto } from '@app/models/finish.model';
+import { FinishDto, FinishPaintLayerDto, FinishPaintDto, FinishPaintSystemDto, ManufacturerDto, PaintLayerSide, State, UpdatePaintLayerRecipeDto } from '@app/models/finish.model';
+import { DeleteRecordEvent, RowRemovingEvent, SelectionChangedEvent } from '@app/models/grid-events.model';
 import { FinishesAdd } from '@app/pages/basedata/finishes-add/finishes-add';
 import { DxButtonModule, DxDataGridModule, DxFormModule, DxPopupModule, DxSelectBoxModule, DxToolbarModule } from 'devextreme-angular';
 import { confirm } from 'devextreme/ui/dialog';
 import notify from 'devextreme/ui/notify';
 import { firstValueFrom } from 'rxjs';
 
-type RawPaintLayerRecipe = {
+interface RawPaintLayerRecipe {
   id?: number;
   finishCode?: string;
   paintLine?: string;
@@ -28,9 +29,9 @@ type RawPaintLayerRecipe = {
   state?: string;
   version?: string;
   paintLayers?: RawPaintLayer[];
-};
+}
 
-type RawPaintLayer = {
+interface RawPaintLayer {
   id?: number;
   layerNumber?: number;
   side?: string;
@@ -46,7 +47,7 @@ type RawPaintLayer = {
   isPrimer?: boolean;
   isWrinkle?: boolean;
   isTransparentOrClearCoat?: boolean;
-};
+}
 
 @Component({
   selector: 'app-finishes',
@@ -102,7 +103,7 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     this.editInline = false;
   }
 
-  public override refresh(e: any): void {
+  public override refresh(): void {
     this.loading = true;
     this.records = [];
 
@@ -119,11 +120,11 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
       });
   }
 
-  onSelectionChanged(e: any): void {
-    this.selectedRowKeys = e.selectedRowKeys;
+  onSelectionChanged(e: SelectionChangedEvent<number>): void {
+    this.selectedRowKeys = e.selectedRowKeys ?? [];
   }
 
-  onRowRemoving(e: any): void {
+  onRowRemoving(e: RowRemovingEvent<unknown>): void {
     const result = firstValueFrom(this.api.delete(`${this.entityEndpoint}/${e.key}`));
     e.cancel = new Promise<boolean>((resolve, reject) => {
       result
@@ -141,16 +142,16 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     this.editMode = EditMode.Read;
   }
 
-  SaveRecord = (e: any): void => {
+  SaveRecord = (_e?: unknown): void => {
     this.gridx.instance.saveEditData();
   }
 
-  public override addRecord(e: any): void {
+  public override addRecord(): void {
     this.editMode = EditMode.Add;
     this.isAddPopupVisible = true;
   }
 
-  EditRecord = (e: any): void => {
+  EditRecord = (e: DeleteRecordEvent<Partial<FinishDto>, unknown>): void => {
     this.editMode = EditMode.Edit;
     this.updateModel = {
       id: e.data?.id ?? 0,
@@ -162,8 +163,8 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     this.isUpdatePopupVisible = true;
   }
 
-  DeleteRecord = (e: any): void => {
-    const recordId = e.data?.[this.recordIdField] ?? e.key;
+  DeleteRecord = (e: DeleteRecordEvent<Partial<FinishDto>, unknown>): void => {
+    const recordId = e.data?.id ?? e.key;
     const result = confirm(`Are you sure you want to delete record #${recordId}?`, 'Confirm Delete');
     result.then((dialogResult) => {
       if (dialogResult) {
@@ -174,7 +175,7 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     });
   }
 
-  CancelEdit = (e: any): void => {
+  CancelEdit = (_e?: unknown): void => {
     this.gridx.instance.cancelEditData();
     this.editMode = EditMode.Read;
   }
@@ -187,7 +188,7 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
   onAddPopupSaved(): void {
     this.isAddPopupVisible = false;
     this.editMode = EditMode.Read;
-    this.refresh(null);
+    this.refresh();
   }
 
   onUpdatePopupClosed(): void {
@@ -215,7 +216,7 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
         this.isUpdatePopupVisible = false;
         this.updateModel = this.createEmptyUpdateModel();
         this.editMode = EditMode.Read;
-        this.refresh(null);
+        this.refresh();
       })
       .catch((err) => {
         console.error('Saving finish failed', err);
@@ -230,9 +231,9 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     maxSpeedRun1: number | null;
     maxSpeedRun2: number | null;
     maxSpeedRun3: number | null;
-  }): any {
-    const payload: any = {
-      state: source.state,
+  }): Partial<UpdatePaintLayerRecipeDto> {
+    const payload: Partial<UpdatePaintLayerRecipeDto> = {
+      state: this.normalizeState(source.state),
     };
 
     const maxSpeedRun1 = this.normalizeOptionalSpeed(source.maxSpeedRun1);
@@ -314,11 +315,11 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
       surfaceQuality: source.surfaceQuality ?? '',
       preTreatment: source.preTreatment ?? '',
       runs: source.runs ?? 0,
-      side: (source.side as any) ?? 'FrontSide',
-      maxSpeedRun1: source.maxSpeedRun1 ?? null as any,
-      maxSpeedRun2: source.maxSpeedRun2 ?? null as any,
-      maxSpeedRun3: source.maxSpeedRun3 ?? null as any,
-      state: (source.state as any) ?? 'Trial',
+      side: this.normalizeSide(source.side),
+      maxSpeedRun1: source.maxSpeedRun1 ?? 0,
+      maxSpeedRun2: source.maxSpeedRun2 ?? 0,
+      maxSpeedRun3: source.maxSpeedRun3 ?? 0,
+      state: this.normalizeState(source.state),
       version: source.version ?? '',
       paintLayers: (source.paintLayers ?? []).map((layer) => this.mapToFinishPaintLayerDto(layer)),
     };
@@ -353,11 +354,25 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     return {
       id: source.id ?? 0,
       layerNumber: source.layerNumber ?? 0,
-      side: (source.side as any) ?? 'FrontSide',
+      side: this.normalizeSide(source.side),
       layerThickness: source.layerThickness ?? 0,
       paint,
       paintSystem,
     };
+  }
+
+  private normalizeSide(value: string | undefined): PaintLayerSide {
+    if (value === 'BackSide' || value === 'BothSides' || value === 'FrontSide') {
+      return value;
+    }
+    return 'FrontSide';
+  }
+
+  private normalizeState(value: string | undefined): State {
+    if (value === 'Released' || value === 'Blocked' || value === 'Archived' || value === 'Trial') {
+      return value;
+    }
+    return 'Trial';
   }
 
 

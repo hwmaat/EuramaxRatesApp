@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { AuthStateService } from '@app/services/auth-state.service';
 import { ThemeService } from './services/theme.service';
@@ -8,6 +8,7 @@ import { DxDrawerModule } from 'devextreme-angular';
 import { SideMenuComponent } from './layout/side-menu/side-menu.component';
 import { ServerDownBannerComponent } from './helpers/server-down-banner/server-down-banner.component';
 import { GlobalErrorComponent } from './helpers/global-error/global-error.component';
+import { MenuClickEvent } from '@app/models/menu-events.model';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,7 @@ import { GlobalErrorComponent } from './helpers/global-error/global-error.compon
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })
-export class App {
+export class App implements OnInit {
   auth = inject(AuthStateService);
   themeService = inject(ThemeService);
   router = inject(Router);
@@ -26,7 +27,7 @@ export class App {
 
   }
 
-  onMenuItemClick(e: any) {
+  onMenuItemClick(e: MenuClickEvent) {
     const item = e.itemData;
     if (item.path !== undefined) {
       this.router.navigateByUrl(item.path);

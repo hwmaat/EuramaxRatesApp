@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 //import { ThemeService } from '@app/services/theme.service';
 import { CommonModule } from '@angular/common';
@@ -9,7 +9,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home {
+export class Home implements OnInit {
 
   ngOnInit(): void {
 

@@ -3,6 +3,7 @@ import { DxDropDownButtonModule, DxLoadIndicatorModule } from 'devextreme-angula
 import { WithDestroy } from '@app/helpers/WithDestroy';
 import { CommonModule } from '@angular/common';
 import { interval, takeUntil } from 'rxjs';
+import { MenuClickEvent } from '@app/models/menu-events.model';
 
 export interface GridDataDto {
   sets: GridDataSetDto[];
@@ -20,7 +21,6 @@ export interface GridRowDto {
   order: number;
   dimset: string;
 }
-
 
 @Component({
   selector: 'app-lineinfo',
@@ -176,10 +176,11 @@ export class Lineinfo extends WithDestroy() implements OnInit, OnDestroy {
     this.startMetersTicker();
   }
 
-  handleMenuItemClick(e: any): void {
+  handleMenuItemClick(e: MenuClickEvent): void {
     const id = e?.itemData?.id;
     if (id === 'remove') this.remove.emit();
     if (id === 'configure') {
+      return;
     }
   }
 

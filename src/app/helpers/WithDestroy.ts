@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 
@@ -10,7 +11,6 @@ export function WithDestroy<TBase extends Constructor<{}>>(Base: TBase = class {
     ngOnDestroy(): void {
       this.destroy$.next();
       this.destroy$.complete();
-      //console.log('WithDestroy.component ==>  ngOnDestroy', this.constructor.name);
     }
   };
 }

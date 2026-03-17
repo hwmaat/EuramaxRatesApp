@@ -34,7 +34,6 @@ export class Globals {
   // --- public API ---
 
   async setEnvironmentMode(mode: string): Promise<void> {
-    console.log('globals.service ==> setEnvironmentMode', mode  );
     try {
       const env = mode === 'prod' ? 'prod' : 'dev';
 
@@ -52,7 +51,6 @@ export class Globals {
       // Persist settings and mode
       this.setSettings(normalized);
       this.environmentModeSubject.next(mode);
-      //console.log('globals.service ==> procname', this.settings());
 
       
     } catch (error) {
@@ -85,7 +83,6 @@ export class Globals {
     if (/^https?:\/\//i.test(path)) return path; // already absolute
 
     const base = this.apiBaseUrl();
-    //console.log('globals.service ==> base', base);
     if (!base) throw new Error('API base URL not configured. Ensure the initializer ran.');
     const p = path.startsWith('/') ? path : `/${path}`;
     return `${base}${p}`; // exactly one slash junction
@@ -100,7 +97,7 @@ export class Globals {
     const trimmedUrl = (config.apiBaseUrl || '').trim().replace(/\/+$/, '');
     try {
       // Throws if invalid URL (e.g., empty or relative)
-      // eslint-disable-next-line no-new
+       
       new URL(trimmedUrl);
     } catch {
       throw new Error(`Configuration invalid. apiBaseUrl must be an absolute URL. Received: "${config.apiBaseUrl}"`);

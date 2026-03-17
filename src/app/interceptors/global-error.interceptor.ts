@@ -1,16 +1,26 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, tap, throwError, of } from 'rxjs';
+import { catchError, tap, throwError } from 'rxjs';
 
 import { Globals } from '@app/services/globals.service';
 import { ErrorService } from '@app/services/error.service';
 
+interface ApiErrorPayload {
+  title?: string;
+  detail?: string;
+  message?: string;
+  instance?: string;
+  errors?: Record<string, unknown>;
+}
 
-/**
- * Guards to avoid repeated navigation / spam
- */
-let navigatedToServerDown = false;
+const asApiErrorPayload = (value: unknown): ApiErrorPayload => {
+  if (!value || typeof value !== 'object') {
+    return {};
+  }
+  return value as ApiErrorPayload;
+};
+
 
 const formatValidationErrors = (payload: unknown): string | null => {
   if (!payload || typeof payload !== 'object') {
@@ -50,7 +60,6 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
       next: () => {
         if (!globals.serverAvailable()) {
           globals.setServerAvailable(true);
-          navigatedToServerDown = false;
 
           if (router.url.startsWith('/error/server-down')) {
             router.navigateByUrl('/');
@@ -64,11 +73,10 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
      */
     catchError((err: HttpErrorResponse) => {
 
-      //console.log('global-error.interceptor.ts ==> err', err);
-
       let title = 'Request failed';
       let message = 'An unexpected error occurred.';
       let postAction: (() => void) | null = null;
+      const payload = asApiErrorPayload(err.error);
 
       // status === 0 means: no HTTP response (network/CORS/abort)
       // NEVER log out on this
@@ -94,8 +102,7 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
        */
 
       else if (err.status === 401) {
-        console.log('global-error.interceptor ==> procname 401', err);
-        const msg = (err.error as any)?.message ?? err.message;
+        const msg = payload.message ?? err.message;
         title = 'Authentication failed';
         message = `${msg} Please check your credentials and try again.`;
       }
@@ -104,7 +111,6 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
        * Forbidden
        */
       else if (err.status === 403) {
-        console.log('global-error.interceptor ==> procname 403', err);
         title = 'Access denied';
         message = 'You do not have permission to perform this action.';
         postAction = () => router.navigateByUrl('/');
@@ -114,21 +120,18 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
        * Not found 404
        */
       else if (err.status === 404) {
-        console.log('global-error.interceptor ==> procname 404', err);
         title = 'Not found';
         const url =
-          (err.error as any)?.instance ||
+          payload.instance ||
           err.url ||
           'Unknown endpoint';
 
         message = `The requested endpoint was not found:\n${url}`;
-        console.log('global-error.interceptor ==> message:', message);
       }
       /**
        * Not found 405
        */
       else if (err.status === 405) {
-        console.log('global-error.interceptor ==> procname 405', err);
         title = 'Method not allowed';
 
         const method = err.headers?.get('Allow')
@@ -142,13 +145,12 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
           `${url}\n${method}`;
       }
       else if (err.status === 409) {
-        console.log('global-error.interceptor ==> procname 409',err);
         title =
-          (err.error as any)?.title ??
+          payload.title ??
           'Invalid operation';
 
         message =
-          (err.error as any)?.detail ??
+          payload.detail ??
           err.message ??
           'The requested operation is not allowed in the current state.';
       }
@@ -157,19 +159,17 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
        * Validation / bad request
        */
       else if (err.status === 400 || err.status === 422) {
-        console.log('global-error.interceptor ==> procname 400', err);
-        const payload = err.error;
-        title = (payload as any)?.title ?? 'Validation failed';
+        title = payload.title ?? 'Validation failed';
 
-        if (typeof payload === 'string') {
-          message = payload;
-        } else if (payload && typeof payload === 'object') {
+        if (typeof err.error === 'string') {
+          message = err.error;
+        } else if (err.error && typeof err.error === 'object') {
           const baseMessage =
-            (payload as any)?.detail ??
-            (payload as any)?.message ??
+            payload.detail ??
+            payload.message ??
             'One or more validation errors occurred.';
 
-          const validationDetails = formatValidationErrors(payload);
+          const validationDetails = formatValidationErrors(err.error);
           message = validationDetails ? `${baseMessage}\n${validationDetails}` : baseMessage;
         } else {
           message = 'One or more validation errors occurred.';
@@ -180,10 +180,9 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
        * Server-side errors
        */
       else if (err.status >= 500) {
-        console.log('global-error.interceptor ==> procname', err.status);
-        title = (err.error as any)?.title ?? 'Server error';
+        title = payload.title ?? 'Server error';
         message =
-          (err.error as any)?.detail ??
+          payload.detail ??
           'The server encountered an error. Please try again later.';
       }
 
@@ -208,7 +207,7 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
         message,
         severity,
         status: err.status,
-        instance: (err.error as any)?.instance,
+        instance: payload.instance,
 
         autoDismissMs:
           severity === 'info' ? 5000 :

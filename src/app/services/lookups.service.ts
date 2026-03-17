@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { ApiService } from '@app/services/api.service';
 import { ProductionLine } from '@app/models/productionlines.options';
 import { Observable } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import { map, shareReplay } from 'rxjs/operators';
 
 interface ProductionLineDto {
   id: number;
@@ -34,7 +34,6 @@ export class LookupsService {
   getProductionLines(forceRefresh = false): Observable<ProductionLine[]> {
     if (!this.productionLines$ || forceRefresh) {
       this.productionLines$ = this.api.get<ProductionLineDto[]>('production-lines').pipe(
-        tap((items) => console.log('lookups.service ==> procname', items)),
         map((items) =>
           (items ?? [])
             .map((x) => ({ id: x.id, productionLine: (x.name ?? '').trim() }))

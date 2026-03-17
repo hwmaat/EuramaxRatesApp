@@ -12,7 +12,7 @@
           revealMode="expand"
           >
           <div *dxTemplate="let data of 'menu'">
-            <side-menu (menuItemClick)="onMenuItemClick($event)"></side-menu>
+            <app-side-menu (menuItemClick)="onMenuItemClick($event)"></app-side-menu>
           </div>
           <router-outlet></router-outlet>
       </dx-drawer>

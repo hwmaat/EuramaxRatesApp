@@ -3,6 +3,7 @@ import { AfterViewInit, Component, OnInit, inject } from '@angular/core';
 import { AmsLoadPanelComponent } from '@app/helpers/ams-load-panel/ams-load-panel.component';
 import { BaseGrid } from '@app/helpers/basegrid';
 import { EditMode } from '@app/models/enum';
+import { DeleteRecordEvent, InlineEditEvent, RowRemovingEvent, SelectionChangedEvent } from '@app/models/grid-events.model';
 import { OvenSettingDto, OvenSettingsPatchDto, OvenSettingState } from '@app/models/ovensetting.model';
 import { LookupsService } from '@app/services/lookups.service';
 import { DxButtonModule, DxDataGridModule, DxSelectBoxModule, DxToolbarModule } from 'devextreme-angular';
@@ -22,19 +23,19 @@ selectedRowKeys: number[] = [];
 readonly stateOptions: OvenSettingState[] = ['Trial', 'Released', 'Blocked', 'Archived'];
 paintLineOptions: string[] = [];
 substrateOptions: string[] = [];
-readonly paintLineEditorOptions: any = {
+readonly paintLineEditorOptions: Record<string, unknown> = {
   items: this.paintLineOptions,
   searchEnabled: true,
   showClearButton: true,
   placeholder: 'Geen productielijnen beschikbaar',
 };
-readonly substrateEditorOptions: any = {
+readonly substrateEditorOptions: Record<string, unknown> = {
   items: this.substrateOptions,
   searchEnabled: true,
   showClearButton: true,
   placeholder: 'Geen substrates beschikbaar',
 };
-readonly stateEditorOptions: any = {
+readonly stateEditorOptions: Record<string, unknown> = {
   items: this.stateOptions,
 };
 private lookups = inject(LookupsService);
@@ -76,16 +77,16 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     this.showTreeButton=true;
     this.editInline = true;
  }
-  public override refresh(e: any): void {
+  public override refresh(): void {
     this.records = [];
     const spParams = new Map();
     this.loadDataDirect(spParams);
   }
 
-  onSelectionChanged(e: any) {
-    this.selectedRowKeys = e.selectedRowKeys;
+  onSelectionChanged(e: SelectionChangedEvent<number>) {
+    this.selectedRowKeys = e.selectedRowKeys ?? [];
   }
-  onRowRemoving(e:any){
+  onRowRemoving(e: RowRemovingEvent<unknown>){
       const id = e.key;
       const result = firstValueFrom(this.api.delete(`${this.entityEndpoint}/${id}`));
 
@@ -107,10 +108,10 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
       this.gridx?.instance.option('editing.mode', 'row');
   }
 
-  SaveRecord = (e: any) => {
+  SaveRecord = (_e?: unknown) => {
     this.gridx.instance.saveEditData();
   }
-  public override addRecord(e: any): void {
+  public override addRecord(): void {
     const loadLookups = Promise.all([
       this.paintLineOptions.length > 0
         ? Promise.resolve(this.paintLineOptions)
@@ -130,24 +131,29 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     });
   }
 
-  onRowInserted(e: any): void {
+  onRowInserted(_e?: unknown): void {
     this.editMode = EditMode.Read;
     this.gridx?.instance.option('editing.mode', 'row');
   }
 
-  onInitNewRow(e: any): void {
+  onInitNewRow(_e?: unknown): void {
     this.editMode = EditMode.Add;
     this.gridx?.instance.option('editing.mode', 'popup');
   }
 
-  onEditingStart(e: any): void {
+  onEditingStart(e: { data?: { id?: unknown } }): void {
     if (e?.data?.id) {
       this.editMode = EditMode.Edit;
       this.gridx?.instance.option('editing.mode', 'row');
     }
   }
 
-  onEditorPreparing(e: any): void {
+  onEditorPreparing(e: {
+    dataField?: string;
+    row?: { isNewRow?: boolean };
+    editorName?: string;
+    editorOptions?: Record<string, unknown>;
+  }): void {
     if (!e?.dataField) return;
 
     const isNewRow = !!e.row?.isNewRow || this.editMode === EditMode.Add;
@@ -155,10 +161,10 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     if (e.dataField === 'paintLine') {
       e.editorName = 'dxSelectBox';
       e.editorOptions = e.editorOptions || {};
-      e.editorOptions.items = this.paintLineOptions;
-      e.editorOptions.searchEnabled = true;
-      e.editorOptions.showClearButton = true;
-      e.editorOptions.placeholder = this.paintLineOptions.length > 0
+      e.editorOptions['items'] = this.paintLineOptions;
+      e.editorOptions['searchEnabled'] = true;
+      e.editorOptions['showClearButton'] = true;
+      e.editorOptions['placeholder'] = this.paintLineOptions.length > 0
         ? 'Selecteer productielijn'
         : 'Geen productielijnen beschikbaar';
     }
@@ -166,22 +172,26 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     if (e.dataField === 'substrate') {
       e.editorName = 'dxSelectBox';
       e.editorOptions = e.editorOptions || {};
-      e.editorOptions.items = this.substrateOptions;
-      e.editorOptions.searchEnabled = true;
-      e.editorOptions.showClearButton = true;
-      e.editorOptions.placeholder = this.substrateOptions.length > 0
+      e.editorOptions['items'] = this.substrateOptions;
+      e.editorOptions['searchEnabled'] = true;
+      e.editorOptions['showClearButton'] = true;
+      e.editorOptions['placeholder'] = this.substrateOptions.length > 0
         ? 'Selecteer substrate'
         : 'Geen substrates beschikbaar';
     }
 
     if (this.addOnlyEditableFields.has(e.dataField)) {
       e.editorOptions = e.editorOptions || {};
-      e.editorOptions.readOnly = !isNewRow;
+      e.editorOptions['readOnly'] = !isNewRow;
     }
   }
 
-  public override rowUpdating(e: any): void {
-    const updated: OvenSettingDto = { ...e.oldData, ...e.newData };
+  public override rowUpdating(e: {
+    oldData: Partial<OvenSettingDto>;
+    newData: Partial<OvenSettingDto>;
+    cancel?: boolean | PromiseLike<boolean> | PromiseLike<void>;
+  }): void {
+    const updated: Partial<OvenSettingDto> = { ...e.oldData, ...e.newData };
     const patchDto: OvenSettingsPatchDto = {
       state: updated.state,
       zone1: updated.zone1 ?? null,
@@ -205,7 +215,7 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     });
   }
 
-  EditRecord = (e:any) => {
+  EditRecord = (e: InlineEditEvent<{ option: (name: string, value: string) => void; editRow: (rowIndex: number) => void }>) => {
     
     if (this.editInline){
       this.startInlineEdit(e);
@@ -215,7 +225,7 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     }
   }
 
-  startInlineEdit(e: any) {
+  startInlineEdit(e: InlineEditEvent<{ option: (name: string, value: string) => void; editRow: (rowIndex: number) => void }>) {
     const rowIndex = e.rowIndex;
     const grid = e.component;
     this.editMode = EditMode.Edit;
@@ -223,8 +233,8 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     grid.editRow(rowIndex);
   }
 
-  DeleteRecord = (e:any) => {
-     const result = confirm(`Are you sure you want to delete record #${e.data.id}?`, 'Confirm Delete');
+    DeleteRecord = (e: DeleteRecordEvent<{ id?: unknown }>) => {
+      const result = confirm(`Are you sure you want to delete record #${e.data?.id}?`, 'Confirm Delete');
      result.then((dialogResult) => {
        if (dialogResult) {
         this.editMode = EditMode.Delete;
@@ -233,7 +243,7 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
        }
      });
   }
-  CancelEdit = (e: any) => {
+  CancelEdit = (_e?: unknown) => {
     this.gridx.instance.cancelEditData();
     this.editMode = EditMode.Read;
   }

@@ -11,13 +11,11 @@ export class ThemeService {
   private readonly linkId = 'dx-theme';
 
   constructor() {
-    //console.log('theme.service ==> constructor');
     this.loadInitialTheme();
   }
 
   public loadInitialTheme(): void {
     const savedTheme = localStorage.getItem('theme');
-    //console.log('theme.service ==> loadInitialTheme', savedTheme);
     // Validate the saved theme
     if (savedTheme === 'dark' || savedTheme === 'light') {
       this.setTheme(savedTheme);

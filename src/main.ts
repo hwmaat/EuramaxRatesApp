@@ -13,8 +13,6 @@ import { Globals } from '@app/services/globals.service';
 import { environment } from '@environment/environment';
 import { AuthStateService } from '@app/services/auth-state.service';
 import DataGrid from 'devextreme/ui/data_grid';
-import { ApiService } from '@app/services/api.service';
-import { firstValueFrom } from 'rxjs';
 
 //test////
 config({ licenseKey });
@@ -51,15 +49,9 @@ config({ licenseKey });
       }
     } );
 
-const versionInitializer = () => {
-  const api = inject(ApiService);
-  return firstValueFrom(api.checkBackendVersionFromSettings());
-};
- 
 export function configurationInitializer(): () => Promise<void> {
   return async () => {
     const globals = inject(Globals);
-    const api = inject(ApiService);
     const authState = inject(AuthStateService);
 
     const initialMode = environment.production ? 'prod' : 'dev';

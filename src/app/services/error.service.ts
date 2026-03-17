@@ -10,7 +10,7 @@ export class ErrorService {
 
   readonly error$ = this.errorSubject.asObservable();
 
-  private dismissTimer: any;
+  private dismissTimer: ReturnType<typeof setTimeout> | null = null;
 
   show(error: AppError): void {
     // Clear any previous timer

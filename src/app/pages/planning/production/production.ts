@@ -3,6 +3,7 @@ import { AfterViewInit, Component, OnInit, computed, inject, signal } from '@ang
 import { AmsLoadPanelComponent } from '@app/helpers/ams-load-panel/ams-load-panel.component';
 import { BaseGrid } from '@app/helpers/basegrid';
 import { EditMode } from '@app/models/enum';
+import { DeleteRecordEvent, InlineEditEvent, RowRemovingEvent, SelectionChangedEvent } from '@app/models/grid-events.model';
 import { FinishDetails } from '@app/pages/basedata/finish-details/finish-details';
 import { DxButtonModule, DxDataGridModule, DxPopupModule, DxSelectBoxModule, DxTabPanelModule, DxTagBoxModule, DxToolbarModule } from 'devextreme-angular';
 import { firstValueFrom } from 'rxjs';
@@ -22,7 +23,10 @@ interface WeekOption {
   end: Date;
 }
 
-type TransformationEntry = { key: string; value: string };
+interface TransformationEntry {
+  key: string;
+  value: string;
+}
 
 @Component({
   selector: 'app-production',
@@ -110,7 +114,7 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
      });
    }
   
-  onCellPrepared(e: any) {
+  onCellPrepared(e: { rowType?: string; data?: { messages?: unknown[] }; cellElement?: HTMLElement }) {
     if (!e || e.rowType !== 'data') {
       return;
     }
@@ -142,7 +146,7 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
       this.editInline = true;
   }
 
-  public override refresh(e: any): void {
+  public override refresh(): void {
     if ((this.selectedCampaignNumbers?.length ?? 0) === 0) {
       notify({
         message: 'Select at least one campaign number before refreshing.',
@@ -162,7 +166,7 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
     this.loadDataFromUrl(`${this.entityEndpoint}?${selectedString}`,  spParams);
   }
 
-  onLayerRecipePopup(layer: any): void {
+  onLayerRecipePopup(layer: { paintLayerRecipeId?: number | null } | null | undefined): void {
     this.selectedPaintLayerRecipeId.set(layer?.paintLayerRecipeId ?? null);
     this.finishDetailsVisible.set(true);
   }
@@ -207,8 +211,6 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
   }
 
   getCampaignNumbersForSelectedProdLine(): void {
-
-    console.log('production ==> getCampaignNumbersForSelectedProdLine', this.selectedProdLineId , this.weekStartDate , this.weekEndDate );
     if (!this.canLoadCampaignNumbers()) {
       return;
     }
@@ -223,7 +225,6 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
     spParams.set('endDate', dayjs(this.weekEndDate as Date).format('YYYY-MM-DD'));
     this.api.get<CampaignDto[]>(`production-orders/campaigns`, spParams).subscribe({
       next: (numbers) => {
-        console.log('production ==> getCampaignNumbersForSelectedProdLine', numbers);
         this.campaignNumbers = (numbers ?? []).map((c) => ({
           ...c,
           description: `${c.campaignNumber}: (${c.productionOrderCount})`,
@@ -232,16 +233,16 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
     });
   }
 
-  onSelectionChanged(e: any) {
-    this.selectedRowKeys = e.selectedRowKeys;
+  onSelectionChanged(e: SelectionChangedEvent<number>) {
+    this.selectedRowKeys = e.selectedRowKeys ?? [];
   }
 
-  onRowRemoving(e:any){
+  onRowRemoving(e: RowRemovingEvent<unknown>){
        const spParams = new Map();
           spParams.set('id', e.key);  
-          let result = firstValueFrom(this.api.delete(this.entityEndpoint,spParams));
+          const result = firstValueFrom(this.api.delete(this.entityEndpoint,spParams));
           e.cancel = new Promise<boolean>((resolve, reject) => {
-            result.then((result) => {
+            result.then(() => {
             resolve(false);
             })
               .catch((err) => {
@@ -255,16 +256,16 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
       this.editMode = EditMode.Read;
   }
 
-  SaveRecord = (e: any) => {
+  SaveRecord = (_e?: unknown) => {
     this.gridx.instance.saveEditData();
   }
 
-  public override addRecord(e: any): void {
+  public override addRecord(): void {
     this.editMode = EditMode.Add;
     this.gridx.instance.addRow();
   }
 
-  EditRecord = (e:any) => {
+  EditRecord = (e: InlineEditEvent) => {
     
     if (this.editInline){
       this.startInlineEdit(e);
@@ -274,15 +275,15 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
     }
   }
 
-  startInlineEdit(e: any) {
+  startInlineEdit(e: InlineEditEvent) {
     const rowIndex = e.rowIndex;
     const grid = e.component;
     this.editMode = EditMode.Edit;
     grid.editRow(rowIndex);
   }
 
-  DeleteRecord = (e:any) => {
-     const result = confirm(`Are you sure you want to delete record #${e.data.id}?`, 'Confirm Delete');
+    DeleteRecord = (e: DeleteRecordEvent<{ id?: unknown }>) => {
+      const result = confirm(`Are you sure you want to delete record #${e.data?.id}?`, 'Confirm Delete');
      result.then((dialogResult) => {
        if (dialogResult) {
         this.editMode = EditMode.Delete;
@@ -292,12 +293,15 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
      });
   }
 
-  CancelEdit = (e: any) => {
+  CancelEdit = (_e?: unknown) => {
     this.gridx.instance.cancelEditData();
     this.editMode = EditMode.Read;
   }
 
-  onYearChanged(e: any): void {
+  onYearChanged(e: { value?: number }): void {
+    if (typeof e.value !== 'number') {
+      return;
+    }
     this.selectedYear = e.value;
     this.weeks = this.generateWeekOptions(this.selectedYear);
     this.updateWeekDates();
@@ -306,7 +310,10 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
     this.records = [];
   }
 
-  onProdLineChanged(e: any): void {
+  onProdLineChanged(e: { value?: number }): void {
+    if (typeof e.value !== 'number') {
+      return;
+    }
     const selected = this.productionLines.find(pl => pl.id === e.value);
     this.selectedProdLine = selected?.productionLine ?? '';
     this.selectedProdLineId = selected ? selected.id : 0;
@@ -316,7 +323,10 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
     this.records = [];
   }
 
-  onWeeksChanged(e: any): void {
+  onWeeksChanged(e: { value?: number }): void {
+    if (typeof e.value !== 'number') {
+      return;
+    }
     this.selectedWeeks =[e.value];
     this.clearCampaignNumbers();
     this.updateWeekDates();
@@ -325,8 +335,7 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
   }
 
 
-  onCampaignNumbersChanged(e: any): void {
-    console.log('production ==> onCampaignNumbersChanged', e);
+  onCampaignNumbersChanged(e: { value?: unknown }): void {
     this.selectedCampaignNumbers = Array.isArray(e.value) ? e.value : [];
     this.saveFiltersToStorage();
     this.records = [];
@@ -361,14 +370,13 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
         // Set defaults if no storage
         this.selectedYear = new Date().getFullYear();
       }
-    } catch (err) {
+    } catch {
       // Fallback to defaults
       this.selectedYear = new Date().getFullYear();
     }
   }
 
   private generateWeekOptions(year: number): WeekOption[] {
-    console.log('production ==> generateWeekOptions', year);
     const totalWeeks = this.dateFunctions.getIsoWeeksInYear(year);
     const options: WeekOption[] = [];
     for (let week = 1; week <= totalWeeks; week += 1) {

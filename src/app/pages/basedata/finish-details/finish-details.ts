@@ -7,7 +7,7 @@ import { DxButtonModule, DxDataGridModule, DxFormModule, DxPopupModule } from 'd
 import { takeUntil } from 'rxjs';
 import { WithDestroy } from '@app/helpers/WithDestroy';
 
-type FinishForm = {
+interface FinishForm {
   id: number | null;
   finishCode: string;
   paintLine: string;
@@ -25,7 +25,7 @@ type FinishForm = {
   state: string;
   version: string;
   layerCount: number;
-};
+}
 
 @Component({
   selector: 'app-finish-details',

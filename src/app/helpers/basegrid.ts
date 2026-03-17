@@ -5,9 +5,8 @@ import { exportDataGrid } from "devextreme/excel_exporter";
 import { Workbook } from "exceljs";
 import { saveAs } from 'file-saver';
 import { ThemeService } from "@app/services/theme.service";
-import { firstValueFrom, lastValueFrom, Observable, take, takeUntil } from "rxjs";
+import { firstValueFrom, take, takeUntil } from "rxjs";
 import { ApiService } from "@services/api.service";
-import notify from "devextreme/ui/notify";
 import { Globals } from "@app/services/globals.service";
 import { EditMode } from "@app/models/enum";
 
@@ -29,10 +28,10 @@ protected globals = inject(Globals);
 
 editMode = EditMode.Read
 rowIndex = -1;
-rowFilter:boolean = false;
-columnLines:boolean = false;
-subTotals: boolean = false;
-headerFilter:boolean = false;
+rowFilter = false;
+columnLines = false;
+subTotals = false;
+headerFilter = false;
 pagingEnabled = true;
 expanded = true;
 hoverIndex = -1;
@@ -47,21 +46,21 @@ page = 1;
 pageSize = 25;
 
 public info = ' ';
-public showclearFilterSwitch:boolean=true;
-public showColumnLinesSwitch:boolean=true;
-public showHeaderFilterSwitch:boolean=true;
-public showRowFilterSwitch:boolean=true;
-public showGridCaption:boolean=false;
-public showAddButton:boolean = false;
-public showRefreshButton:boolean  = true;
-public showSubTotalsSwitch:boolean = false;
-public showTreeButton:boolean = false;
-public showInlineEditButton:boolean = false;
-public addButtonLocation:string='after';
-public refreshButtonLocation:string='after';
-public showColumnChooserButton:boolean = false;
-public showMultiSelect:boolean = false;
-public multiSelect:boolean = false;
+public showclearFilterSwitch=true;
+public showColumnLinesSwitch=true;
+public showHeaderFilterSwitch=true;
+public showRowFilterSwitch=true;
+public showGridCaption=false;
+public showAddButton = false;
+public showRefreshButton  = true;
+public showSubTotalsSwitch = false;
+public showTreeButton = false;
+public showInlineEditButton = false;
+public addButtonLocation='after';
+public refreshButtonLocation='after';
+public showColumnChooserButton = false;
+public showMultiSelect = false;
+public multiSelect = false;
 public selectionMode = "single"
 
 headerfilterText='header filter';
@@ -84,7 +83,7 @@ records: T[] = [];
 validationMessage = '';
 popupVisible = false;
 
-@ViewChild('formRef') formRef: any;
+@ViewChild('formRef') formRef: unknown;
 
 euroformat = { style: 'currency',  currency: 'EUR', useGrouping: true, minimumIntegerDigits:1 ,minimumFractionDigits: 4, maximumFractionDigits:4 };
 euroformat2 = { style: 'currency',  currency: 'EUR', useGrouping: true, minimumIntegerDigits:1 ,minimumFractionDigits: 2, maximumFractionDigits:2 };
@@ -117,8 +116,13 @@ constructor() {
       }); 
     }
 
-    onToolbarPreparing(e:any) {
-      e.toolbarOptions.items.unshift(
+    onToolbarPreparing(e: { toolbarOptions?: { items?: unknown[] } }) {
+      const toolbarItems = e.toolbarOptions?.items;
+      if (!toolbarItems) {
+        return;
+      }
+
+      toolbarItems.unshift(
         {
           location: 'before',
           template: 'headercaption',
@@ -289,19 +293,16 @@ constructor() {
 
   loadColumnLayout(): void {
     if (!this.gridx?.instance || !this.storageKey) {
-      //console.log('Cannot load - gridx or storageKey missing:', !!this.gridx?.instance, this.storageKey);
       return;
     }
 
     const savedState = localStorage.getItem(`grid-state-${this.storageKey}`);
     if (!savedState) {
-      //console.log('No saved state found for:', this.storageKey);
       return;
     }
 
     try {
       const state = JSON.parse(savedState);
-      //console.log('Loading grid state for:', this.storageKey, state);
       
       // Check if grid is ready before applying state
       if (this.gridx.instance.getDataSource() && this.gridx.instance.getDataSource().isLoaded()) {
@@ -310,7 +311,6 @@ constructor() {
         try {
           this.gridx.instance.state(state);
           this.gridx.instance.endUpdate();
-          //console.log('State applied successfully');
         } catch (stateError) {
           console.error('Failed to apply grid state, clearing saved state:', stateError);
           localStorage.removeItem(`grid-state-${this.storageKey}`);
@@ -324,7 +324,7 @@ constructor() {
           this.loadColumnLayout();
         }, 200);
       }
-    } catch (error) {
+    } catch {
 
       localStorage.removeItem(`grid-state-${this.storageKey}`);
     }
@@ -334,19 +334,19 @@ constructor() {
       this.storageKey = key;
   }
 
-    public setInlineEdit(e: any) {
+    public setInlineEdit(e: { value: boolean }) {
       this.editInline = e.value;
       // if (this.editInline) {
       //   this.gridx.instance.option('editing.mode', 'row');
       // } 
     }
 
-    public ShowColumnChooser(e: any) {
+    public ShowColumnChooser() {
       if (this.gridx?.instance) {
         this.gridx.instance.showColumnChooser();  
       }
     }   
-    public addRecord(e: any){
+    public addRecord(){
 
     }
 
@@ -354,11 +354,11 @@ constructor() {
       // Hook for child components to override
     }
     
-    public refresh(e:any) {
+    public refresh() {
       
     }
 
-    onCellHoverChanged  (e:any)  {
+    onCellHoverChanged  (e: { rowType?: string; rowIndex?: number })  {
       if(e.rowType==="data"){
         this.hoverIndex = e.rowIndex;
       } else {
@@ -366,7 +366,7 @@ constructor() {
       }
     }
     
-    getRowIndex(data: { rowType: string; key: any; }): number {
+    getRowIndex(data: { rowType: string; key: unknown; }): number {
       if (data.rowType==="data"){
         this.rowIndex = this.gridx.instance.getRowIndexByKey(data.key);
         return this.rowIndex;}
@@ -384,7 +384,6 @@ constructor() {
         .pipe(take(1))
         .subscribe({
           next: (result) => {
-            console.log('basegrid ==> loadDataDirect', result);
             this.records = result;
             this.loading = false;
           },
@@ -403,7 +402,6 @@ constructor() {
         .subscribe({
           next: (result) => {
             this.records = result;
-            console.log('basegrid ==> loadDataFromUrl', result);
             this.loading = false;
           },
           error: (err) => {
@@ -413,9 +411,9 @@ constructor() {
         });
     }
 
-    rowUpdating (e: any) {
+    rowUpdating (e: { oldData: Partial<T> & { id?: unknown }; newData: Partial<T>; cancel?: Promise<boolean> }) {
       const updated = { ...e.oldData, ...e.newData };
-      let result = firstValueFrom(this.api.put<T>(`${this.entityEndpoint}/${updated.id}`, updated));
+      const result = firstValueFrom(this.api.put<T>(`${this.entityEndpoint}/${updated.id}`, updated));
 
       e.cancel = new Promise<boolean>((resolve, reject) => {
         result.then((result) => {
@@ -432,15 +430,13 @@ constructor() {
     }
  
 
-  rowInserting= (e: any) => {
-    let insertRecord= <T>{};
+  rowInserting= (e: { data: Partial<T>; cancel?: boolean | PromiseLike<boolean> | PromiseLike<void> }) => {
+    const insertRecord= <T>{};
     const inserted = { ...insertRecord, ...e.data };
-    //console.log('basegrid ==> procname', inserted);
-    let result = firstValueFrom(this.api.post<T>(`${this.entityEndpoint}`, inserted))
+    const result = firstValueFrom(this.api.post<T>(`${this.entityEndpoint}`, inserted))
 
     e.cancel = new Promise<boolean>((resolve, reject) => {
       result.then((result) => {
-        console.log('basegrid ==> rowInserting', result);
         resolve(false);
         e.data=result;
         this.editMode = EditMode.Read;
@@ -453,11 +449,11 @@ constructor() {
     })
   }
 
- rowRemoving = (e: any) => {
+ rowRemoving = (e: { key: unknown; cancel?: Promise<boolean> }) => {
     const id = e.key;
-    let result = firstValueFrom(this.api.delete(`${this.entityEndpoint}/${id}`));
+    const result = firstValueFrom(this.api.delete(`${this.entityEndpoint}/${id}`));
     e.cancel = new Promise<boolean>((resolve, reject) => {
-      result.then((result) => {
+      result.then(() => {
         resolve(false)
         this.editMode = EditMode.Read;
         
@@ -471,7 +467,7 @@ constructor() {
   }
 
     //Toolbar switches ==================================================================
-    ShowColumnLines = (e:any) => {
+    ShowColumnLines = (e: { value: boolean }) => {
       this.columnLines = e.value;
       this.gridx.instance.option('showColumnLines', e.value);
    }
@@ -480,7 +476,7 @@ constructor() {
       this.gridx.instance.clearFilter();
     }
   
-    ShowSubtotals = (e:any) => {
+    ShowSubtotals = (e: { value: boolean }) => {
       this.subTotals = e.value;
     }
 
@@ -495,12 +491,12 @@ constructor() {
       this.gridx.instance.option('selection.mode', this.selectionMode);
       this.gridx.instance.repaint();
     }
-    ShowHeaderFilter= (e:any) => {
+    ShowHeaderFilter= (e: { value: boolean }) => {
       this.headerFilter=e.value;
       this.gridx.instance.option('headerFilter.visible', e.value);
     }
   
-    ShowRowFilter = (e:any) => {
+    ShowRowFilter = (e: { value: boolean }) => {
       this.rowFilter=e.value;
       this.gridx.instance.option('filterRow.visible', e.value);
     }
@@ -526,7 +522,7 @@ constructor() {
     }  
 
     //events=============================================================================
-    onExporting(e: any, sheetName:string) {
+    onExporting(e: { component: DxDataGridComponent['instance']; cancel?: boolean }, sheetName:string) {
       const workbook = new Workbook();
       const worksheet = workbook.addWorksheet(sheetName);
   
