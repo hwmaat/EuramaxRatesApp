@@ -1,0 +1,48 @@
+<dx-popup
+  [visible]="visible()"
+  [showTitle]="true"
+  title="Select Paint"
+  [width]="1000"
+  [height]="'80vh'"
+  [dragEnabled]="true"
+  [showCloseButton]="true"
+  [hideOnOutsideClick]="false"
+  [resizeEnabled]="true"
+  (onShowing)="onShowing()"
+  (onHiding)="onCancel()"
+>
+  <div *dxTemplate="let _ of 'content'" class="paintselected-content">
+    <dx-data-grid
+      [dataSource]="paints"
+      keyExpr="id"
+      [focusedRowEnabled]="true"
+      [hoverStateEnabled]="true"
+      [showBorders]="true"
+      [showColumnLines]="true"
+      [rowAlternationEnabled]="true"
+      [selectedRowKeys]="selectedRowKeys"
+      (onSelectionChanged)="onSelectionChanged($event)"
+    >
+    <dxo-paging [enabled]="true" [pageSize]="15"></dxo-paging>
+		<dxo-pager
+			[visible]="true"
+			[showPageSizeSelector]="true"
+			[showInfo]="true"
+			[showNavigationButtons]="true"
+			[allowedPageSizes]="[5, 10, 15, 20, 25, 100]"
+			[displayMode]="'full'">
+		</dxo-pager>
+      <dxo-selection mode="single"></dxo-selection>
+      <dxi-column dataField="id" caption="id" [width]="80"></dxi-column>
+      <dxi-column dataField="paintCode" caption="paintCode" [width]="160"></dxi-column>
+      <dxi-column dataField="paintDescription" caption="paintDescription" [minWidth]="250"></dxi-column>
+      <dxi-column dataField="paintSystem.name" caption="paintSystem" [width]="170"></dxi-column>
+      <dxi-column dataField="paintSystem.manufacturer.name" caption="paintSystem.manufacturer.name" [minWidth]="260"></dxi-column>
+    </dx-data-grid>
+
+    <div class="paintselected-footer">
+      <dx-button text="OK" icon="check" stylingMode="outlined" (onClick)="onOk()" [disabled]="loading || selectedRowKeys.length === 0"></dx-button>
+      <dx-button text="Cancel" icon="close" stylingMode="outlined" (onClick)="onCancel()"></dx-button>
+    </div>
+  </div>
+</dx-popup>

@@ -2,7 +2,8 @@ export type OvenSettingState = 'Trial' | 'Released' | 'Blocked' | 'Archived';
 
 export interface OvenSettingDto {
   id: number;
-  paintLine: string;
+  productionLineId: number | null;
+  productionLineCode?: string | null;
   thickness: number;
   lineSpeed: number;
   zone1: number;

@@ -208,11 +208,7 @@ export const globalErrorInterceptor: HttpInterceptorFn = (req, next) => {
         severity,
         status: err.status,
         instance: payload.instance,
-
-        autoDismissMs:
-          severity === 'info' ? 5000 :
-          severity === 'warning' ? 7000 :
-          undefined   // errors stay until user closes
+        autoDismissMs: undefined
       });
 
       if (postAction) {

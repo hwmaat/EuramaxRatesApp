@@ -2,7 +2,8 @@
 export interface FinishDto {
   id: number;
   finishCode: string;
-  paintLine: string;
+  productionLineId: number | null;
+  productionLineCode: string | null;
   customer: string;
   customerNumber: string;
   substrate: string;
@@ -22,7 +23,6 @@ export interface FinishDto {
 export interface FinishPaintLayerDto {
   id: number;
   layerNumber: number;
-  side: PaintLayerSide; // e.g. "FrontSide"
   layerThickness: number;
   paint: FinishPaintDto | null;
   paintSystem: FinishPaintSystemDto | null;
@@ -46,7 +46,7 @@ export interface FinishPaintSystemDto {
   name: string | null;
   manufacturer: ManufacturerDto | null;
 }
-//0653410948
+
 export interface ManufacturerDto{
   id: number | null;
   name: string | null;

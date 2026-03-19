@@ -25,7 +25,6 @@ export interface MenuItem {
       access:[ACCESS.ADMIN, ACCESS.PLANNING, ACCESS.PRODUCTION],
       items: [
         
-        { text: 'Oven Settings', path: '/basedata/ovensettings'},
         { text: 'Metal Specifications', path: '/basedata/metalspecs'},
         { text: 'Finishes', path: '/basedata/finishes'},
         { text: 'Paints', path: '/basedata/paints'},

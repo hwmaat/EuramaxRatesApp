@@ -6,6 +6,7 @@ import { map, shareReplay } from 'rxjs/operators';
 
 interface ProductionLineDto {
   id: number;
+  code: string | null;
   name: string | null;
   maxSpeed: number | null;
   maxOvenTemp: number | null;
@@ -36,7 +37,7 @@ export class LookupsService {
       this.productionLines$ = this.api.get<ProductionLineDto[]>('production-lines').pipe(
         map((items) =>
           (items ?? [])
-            .map((x) => ({ id: x.id, productionLine: (x.name ?? '').trim() }))
+            .map((x) => ({ id: x.id, productionLine: (x.code ?? '').trim() }))
             .filter((x) => !!x.productionLine)
             .sort((a, b) => a.productionLine.localeCompare(b.productionLine))
         ),

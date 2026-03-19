@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, output } from '@angular/core';
 import { ApiService } from '@services/api.service';
-import { DxButtonModule, DxDataGridModule, DxFormModule, DxPopupModule, DxSelectBoxModule } from 'devextreme-angular';
+import { DxButtonModule, DxDataGridModule, DxFormModule, DxPopupModule, DxSelectBoxModule, DxTextBoxModule } from 'devextreme-angular';
 import notify from 'devextreme/ui/notify';
 import { firstValueFrom } from 'rxjs';
 import { LookupsService } from '@app/services/lookups.service';
+import { PaintSelectedComponent, PaintSelectionDto } from '@app/pages/basedata/paintselected/paintselected';
 
 interface CreateLayerForm {
   layerNumber: number;
@@ -50,10 +51,15 @@ interface InitNewLayerRowEvent {
   data?: CreateLayerForm;
 }
 
+interface PaintCodeCellContext {
+  value?: string;
+  setValue: (value: string) => void;
+}
+
 @Component({
   selector: 'app-finishes-add',
   standalone: true,
-  imports: [CommonModule, DxPopupModule, DxFormModule, DxButtonModule, DxDataGridModule, DxSelectBoxModule],
+  imports: [CommonModule, DxPopupModule, DxFormModule, DxButtonModule, DxDataGridModule, DxSelectBoxModule, DxTextBoxModule, PaintSelectedComponent],
   templateUrl: './finishes-add.html',
   styleUrl: './finishes-add.scss',
 })
@@ -64,12 +70,14 @@ export class FinishesAdd {
   saved = output<void>();
 
   loading = false;
+  isPaintSelectorVisible = false;
   paintLineOptions: string[] = [];
   substrateOptions: string[] = [];
   stateOptions: string[] = ['Trial', 'Released', 'Blocked', 'Archived'];
   sideOptions: string[] = ['FrontSide', 'BackSide', 'BothSides'];
 
   model: CreateRecipeForm = this.createEmptyRecipe();
+  private activePaintCodeCell: PaintCodeCellContext | null = null;
 
   constructor(private api: ApiService, private lookups: LookupsService) {
     this.lookups.getProductionLineNames().subscribe((items) => {
@@ -116,6 +124,26 @@ export class FinishesAdd {
       paintCode: '',
       layerThickness: 1,
     } as CreateLayerForm;
+  }
+
+  openPaintSelector(cell: PaintCodeCellContext): void {
+    this.activePaintCodeCell = cell;
+    this.isPaintSelectorVisible = true;
+  }
+
+  onPaintSelectorClosed(): void {
+    this.isPaintSelectorVisible = false;
+    this.activePaintCodeCell = null;
+  }
+
+  onPaintSelected(paint: PaintSelectionDto): void {
+    if (!paint?.paintCode || !this.activePaintCodeCell) {
+      this.onPaintSelectorClosed();
+      return;
+    }
+
+    this.activePaintCodeCell.setValue(paint.paintCode);
+    this.onPaintSelectorClosed();
   }
 
   private createEmptyRecipe(): CreateRecipeForm {

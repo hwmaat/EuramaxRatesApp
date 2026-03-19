@@ -186,6 +186,7 @@ export class Productionlines extends BaseGrid<ProductionLineDto> implements OnIn
 
   private toCreatePayload(source: Partial<ProductionLineDto>): CreateProductionLineDto {
     return {
+      code: source.code ?? null,
       name: source.name ?? null,
       maxSpeed: source.maxSpeed ?? null,
       maxOvenTemp: source.maxOvenTemp ?? null,
@@ -194,6 +195,10 @@ export class Productionlines extends BaseGrid<ProductionLineDto> implements OnIn
 
   private toPatchPayload(source: Partial<ProductionLineDto>, original: Partial<ProductionLineDto>): UpdateProductionLineDto {
     const payload: UpdateProductionLineDto = {};
+    if ((source.code ?? null) !== (original.code ?? null)) {
+      payload.code = source.code ?? null;
+    }
+
     if ((source.name ?? null) !== (original.name ?? null)) {
       payload.name = source.name ?? null;
     }

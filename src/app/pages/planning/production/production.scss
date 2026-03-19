@@ -199,3 +199,9 @@
 	margin: 0;
 	color: var(--ams-grid-detail-muted, #52606d);
 }
+
+.campaign-label-with-spinner {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+}

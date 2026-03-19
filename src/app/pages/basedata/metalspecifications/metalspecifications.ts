@@ -29,7 +29,7 @@ selectedRowKeys: number[] = [];
     this.showColumnLinesSwitch=true;
     this.showInlineEditButton = true;
     this.showGridCaption=false;
-    this.showAddButton=false;
+    this.showAddButton=true;
     this.showTreeButton=true;
     this.showMultiSelect=false;
 }
@@ -43,6 +43,7 @@ selectedRowKeys: number[] = [];
     this.showTreeButton=true;
     this.editInline = true;
  }
+
    public override refresh(): void {
     this.records = [];
     const spParams = new Map();
@@ -69,6 +70,7 @@ selectedRowKeys: number[] = [];
 
   ResetEdit() {
       this.editMode = EditMode.Read;
+      this.gridx?.instance.option('editing.mode', 'row');
   }
 
   SaveRecord = (_e?: unknown) => {
@@ -76,7 +78,13 @@ selectedRowKeys: number[] = [];
   }
   public override addRecord(): void {
     this.editMode = EditMode.Add;
+    this.gridx.instance.option('editing.mode', 'popup');
     this.gridx.instance.addRow();
+  }
+
+  onRowInserted(_e?: unknown): void {
+    this.editMode = EditMode.Read;
+    this.gridx?.instance.option('editing.mode', 'row');
   }
 
   EditRecord = (e: InlineEditEvent) => {

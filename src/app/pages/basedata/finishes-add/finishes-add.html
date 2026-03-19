@@ -3,7 +3,7 @@
   [showTitle]="true"
   title="Add Finish"
   [width]="1100"
-  [height]="'90vh'"
+  [height]="'70vh'"
   [dragEnabled]="true"
   [showCloseButton]="true"
   [hideOnOutsideClick]="false"
@@ -38,26 +38,55 @@
       </dxi-item>
     </dx-form>
 
-    <dx-data-grid
-      class="paintlayers-grid"
-      [dataSource]="model.paintLayers"
-      [showBorders]="true"
-      [showColumnLines]="true"
-      [hoverStateEnabled]="true"
-      [rowAlternationEnabled]="true"
-      [paging]="{ enabled: false }"
-      (onInitNewRow)="onInitNewLayerRow($event)"
-    >
-      <dxo-editing mode="row" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="true" [useIcons]="true"></dxo-editing>
+    <div class="paintlayers-grid-host">
+      <dx-data-grid
+        class="paintlayers-grid"
+        [dataSource]="model.paintLayers"
+        [height]="'100%'"
+        keyExpr="id"
+        [showBorders]="true"
+        [showColumnLines]="true"
+        [hoverStateEnabled]="true"
+        [rowAlternationEnabled]="true"
+        [paging]="{ enabled: false }"
+        (onInitNewRow)="onInitNewLayerRow($event)"
+        [groupPanel]='{ visible: false}'
+        [searchPanel]='{ visible: false}'
+      >
+        <dxo-editing mode="row" [allowUpdating]="true" [allowAdding]="true" [allowDeleting]="true" [useIcons]="true"></dxo-editing>
+        <dxi-column dataField="id" caption="id#" [width]="75" [allowEditing]="false"></dxi-column>
+        <dxi-column dataField="layerNumber" caption="Layer" [width]="120" dataType="number" alignment="right"></dxi-column>
+        <dxi-column dataField="paintCode" caption="Paint Code" [width]="220" editCellTemplate="paintCodeEditTemplate"></dxi-column>
+        <dxi-column dataField="layerThickness" caption="Thickness" [width]="140" dataType="number" alignment="right"></dxi-column>
+        <dxi-column  width="100%"></dxi-column>
 
-      <dxi-column dataField="layerNumber" caption="Layer" [width]="120" dataType="number" alignment="right"></dxi-column>
-      <dxi-column dataField="paintCode" caption="Paint Code" [minWidth]="220"></dxi-column>
-      <dxi-column dataField="layerThickness" caption="Thickness" [width]="140" dataType="number" alignment="right"></dxi-column>
-    </dx-data-grid>
+        <div *dxTemplate="let cell of 'paintCodeEditTemplate'">
+          <div class="paint-code-editor">
+            <dx-text-box
+              [value]="cell.value"
+              (onValueChanged)="cell.setValue($event.value ?? '')">
+            </dx-text-box>
+            <dx-button
+              icon="search"
+              hint="Select paint"
+              stylingMode="outlined"
+              (onClick)="openPaintSelector(cell)">
+            </dx-button>
+          </div>
+        </div>
+      </dx-data-grid>
+    </div>
 
     <div class="finishes-add-footer">
       <dx-button icon="save" text="Save" stylingMode="outlined" (onClick)="onSave()" [disabled]="loading"></dx-button>
       <dx-button icon="close" text="Cancel" stylingMode="outlined" (onClick)="onCancel()" [disabled]="loading"></dx-button>
     </div>
+
   </div>
 </dx-popup>
+
+<paintselected
+  [visible]="isPaintSelectorVisible"
+  (selected)="onPaintSelected($event)"
+  (closed)="onPaintSelectorClosed()">
+</paintselected>

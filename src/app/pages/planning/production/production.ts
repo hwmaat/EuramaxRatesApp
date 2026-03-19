@@ -5,7 +5,7 @@ import { BaseGrid } from '@app/helpers/basegrid';
 import { EditMode } from '@app/models/enum';
 import { DeleteRecordEvent, InlineEditEvent, RowRemovingEvent, SelectionChangedEvent } from '@app/models/grid-events.model';
 import { FinishDetails } from '@app/pages/basedata/finish-details/finish-details';
-import { DxButtonModule, DxDataGridModule, DxPopupModule, DxSelectBoxModule, DxTabPanelModule, DxTagBoxModule, DxToolbarModule } from 'devextreme-angular';
+import { DxButtonModule, DxDataGridModule, DxLoadIndicatorModule, DxPopupModule, DxSelectBoxModule, DxTabPanelModule, DxTagBoxModule, DxToolbarModule } from 'devextreme-angular';
 import { firstValueFrom } from 'rxjs';
 import { confirm } from 'devextreme/ui/dialog';
 import { ProductionOrderDto } from '@app/models/productionorder.model';
@@ -15,6 +15,7 @@ import { LookupsService } from '@app/services/lookups.service';
 import dayjs from 'dayjs';
 import { CampaignDto } from '@app/models/campaignDto';
 import notify from 'devextreme/ui/notify';
+import { finalize } from 'rxjs/operators';
 
 interface WeekOption {
   week: number;
@@ -31,7 +32,7 @@ interface TransformationEntry {
 @Component({
   selector: 'app-production',
   imports: [CommonModule, AmsLoadPanelComponent, FinishDetails, DxToolbarModule, DxDataGridModule, DxButtonModule,
-    DxSelectBoxModule, DxTagBoxModule, DxTabPanelModule, DxPopupModule
+    DxSelectBoxModule, DxTagBoxModule, DxTabPanelModule, DxPopupModule, DxLoadIndicatorModule
   ],
   templateUrl: './production.html',
   styleUrl: './production.scss',
@@ -52,6 +53,7 @@ weekStartDate: Date | null = null;
 weekEndDate: Date | null = null;
 campaignNumbers:CampaignDto[] = [];
 selectedCampaignNumbers:number[] = [];
+isCampaignNumbersLoading = false;
 
 transformationDetailsVisible = signal(false);
 selectedTransformation = signal<unknown>(null);
@@ -212,24 +214,35 @@ selectedPaintLayerRecipeId = signal<number | null>(null);
 
   getCampaignNumbersForSelectedProdLine(): void {
     if (!this.canLoadCampaignNumbers()) {
+      this.isCampaignNumbersLoading = false;
       return;
     }
 
     const spParams = new Map<string, string>();
     const productionLine = this.productionLines.find(pl => pl.id === this.selectedProdLineId)?.productionLine ?? '';
     if (!productionLine) {
+      this.isCampaignNumbersLoading = false;
       return;
     }
+
+    this.isCampaignNumbersLoading = true;
     spParams.set('productionLine', productionLine);
     spParams.set('startDate', dayjs(this.weekStartDate as Date).format('YYYY-MM-DD'));
     spParams.set('endDate', dayjs(this.weekEndDate as Date).format('YYYY-MM-DD'));
-    this.api.get<CampaignDto[]>(`production-orders/campaigns`, spParams).subscribe({
+    this.api.get<CampaignDto[]>(`production-orders/campaigns`, spParams).pipe(
+      finalize(() => {
+        this.isCampaignNumbersLoading = false;
+      })
+    ).subscribe({
       next: (numbers) => {
         this.campaignNumbers = (numbers ?? []).map((c) => ({
           ...c,
           description: `${c.campaignNumber}: (${c.productionOrderCount})`,
         }));
-      }
+      },
+      error: () => {
+        this.campaignNumbers = [];
+      },
     });
   }
 

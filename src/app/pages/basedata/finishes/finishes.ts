@@ -3,51 +3,13 @@ import { AfterViewInit, Component, OnInit } from '@angular/core';
 import { AmsLoadPanelComponent } from '@app/helpers/ams-load-panel/ams-load-panel.component';
 import { BaseGrid } from '@app/helpers/basegrid';
 import { EditMode } from '@app/models/enum';
-import { FinishDto, FinishPaintLayerDto, FinishPaintDto, FinishPaintSystemDto, ManufacturerDto, PaintLayerSide, State, UpdatePaintLayerRecipeDto } from '@app/models/finish.model';
+import { FinishDto, FinishPaintDto, FinishPaintLayerDto, State, UpdatePaintLayerRecipeDto } from '@app/models/finish.model';
 import { DeleteRecordEvent, RowRemovingEvent, SelectionChangedEvent } from '@app/models/grid-events.model';
 import { FinishesAdd } from '@app/pages/basedata/finishes-add/finishes-add';
 import { DxButtonModule, DxDataGridModule, DxFormModule, DxPopupModule, DxSelectBoxModule, DxToolbarModule } from 'devextreme-angular';
 import { confirm } from 'devextreme/ui/dialog';
 import notify from 'devextreme/ui/notify';
 import { firstValueFrom } from 'rxjs';
-
-interface RawPaintLayerRecipe {
-  id?: number;
-  finishCode?: string;
-  paintLine?: string;
-  customer?: string;
-  customerNumber?: string;
-  substrate?: string;
-  surfaceTreatment?: string;
-  surfaceQuality?: string;
-  preTreatment?: string;
-  runs?: number;
-  side?: string;
-  maxSpeedRun1?: number;
-  maxSpeedRun2?: number;
-  maxSpeedRun3?: number;
-  state?: string;
-  version?: string;
-  paintLayers?: RawPaintLayer[];
-}
-
-interface RawPaintLayer {
-  id?: number;
-  layerNumber?: number;
-  side?: string;
-  paintCode?: string;
-  paintDescription?: string;
-  layerThickness?: number;
-  paintSystem?: string;
-  manufacturer?: string;
-  metallicType?: string;
-  nonWhite?: boolean;
-  aluNatur?: boolean;
-  volumeFractionOfSolid?: number;
-  isPrimer?: boolean;
-  isWrinkle?: boolean;
-  isTransparentOrClearCoat?: boolean;
-}
 
 @Component({
   selector: 'app-finishes',
@@ -107,10 +69,10 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     this.loading = true;
     this.records = [];
 
-    this.api.get<RawPaintLayerRecipe[]>(this.entityEndpoint)
+    this.api.get<FinishDto[]>(this.entityEndpoint)
       .subscribe({
         next: (result) => {
-          this.records = (result ?? []).map((item) => this.mapToFinishDto(item));
+          this.records = result ?? [];
           this.loading = false;
         },
         error: (err) => {
@@ -263,6 +225,20 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     return data.paintLayers ?? [];
   }
 
+  paintRows(layer: FinishPaintLayerDto): FinishPaintDto[] {
+    const paint = (layer as FinishPaintLayerDto & { paint?: FinishPaintDto | FinishPaintDto[] | null }).paint;
+
+    if (Array.isArray(paint)) {
+      return paint.filter((item): item is FinishPaintDto => !!item);
+    }
+
+    return paint ? [paint] : [];
+  }
+
+  paintCount = (layer: FinishPaintLayerDto): number => {
+    return this.paintRows(layer).length;
+  }
+
   private createEmptyUpdateModel(): {
     id: number;
     state: string;
@@ -301,71 +277,6 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     if (value < 1 || value > 100) {
       errors.push(`${label} must be between 1 and 100.`);
     }
-  }
-
-  private mapToFinishDto(source: RawPaintLayerRecipe): FinishDto {
-    return {
-      id: source.id ?? 0,
-      finishCode: source.finishCode ?? '',
-      paintLine: source.paintLine ?? '',
-      customer: source.customer ?? '',
-      customerNumber: source.customerNumber ?? '',
-      substrate: source.substrate ?? '',
-      surfaceTreatment: source.surfaceTreatment ?? '',
-      surfaceQuality: source.surfaceQuality ?? '',
-      preTreatment: source.preTreatment ?? '',
-      runs: source.runs ?? 0,
-      side: this.normalizeSide(source.side),
-      maxSpeedRun1: source.maxSpeedRun1 ?? 0,
-      maxSpeedRun2: source.maxSpeedRun2 ?? 0,
-      maxSpeedRun3: source.maxSpeedRun3 ?? 0,
-      state: this.normalizeState(source.state),
-      version: source.version ?? '',
-      paintLayers: (source.paintLayers ?? []).map((layer) => this.mapToFinishPaintLayerDto(layer)),
-    };
-  }
-
-  private mapToFinishPaintLayerDto(source: RawPaintLayer): FinishPaintLayerDto {
-    const manufacturer: ManufacturerDto = {
-      id: null,
-      name: source.manufacturer ?? null,
-    };
-
-    const paintSystem: FinishPaintSystemDto = {
-      id: null,
-      name: source.paintSystem ?? null,
-      manufacturer,
-    };
-
-    const paint: FinishPaintDto = {
-      id: null,
-      paintCode: source.paintCode ?? null,
-      paintDescription: source.paintDescription ?? null,
-      metallicType: source.metallicType ?? null,
-      nonWhite: source.nonWhite ?? null,
-      aluNatur: source.aluNatur ?? null,
-      volumeFractionOfSolid: source.volumeFractionOfSolid ?? null,
-      isPrimer: source.isPrimer ?? null,
-      isWrinkle: source.isWrinkle ?? null,
-      isTransparentOrClearCoat: source.isTransparentOrClearCoat ?? null,
-      paintSystemId: null,
-    };
-
-    return {
-      id: source.id ?? 0,
-      layerNumber: source.layerNumber ?? 0,
-      side: this.normalizeSide(source.side),
-      layerThickness: source.layerThickness ?? 0,
-      paint,
-      paintSystem,
-    };
-  }
-
-  private normalizeSide(value: string | undefined): PaintLayerSide {
-    if (value === 'BackSide' || value === 'BothSides' || value === 'FrontSide') {
-      return value;
-    }
-    return 'FrontSide';
   }
 
   private normalizeState(value: string | undefined): State {

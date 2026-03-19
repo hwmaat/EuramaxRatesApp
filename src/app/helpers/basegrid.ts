@@ -385,6 +385,7 @@ constructor() {
         .subscribe({
           next: (result) => {
             this.records = result;
+            console.log('basegrid ==> procname', result);
             this.loading = false;
           },
           error: (err) => {

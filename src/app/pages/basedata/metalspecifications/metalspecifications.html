@@ -23,6 +23,7 @@
     (onExporting)="onExporting($event, 'OvenSettings')"
     (onToolbarPreparing)="onToolbarPreparing($event)"
     (onRowRemoving)="onRowRemoving($event)"
+    (onRowInserted)="onRowInserted($event)"
     (onSelectionChanged)="onSelectionChanged($event)"
     (onEditCanceled)="ResetEdit()"
     [cellHintEnabled]="true"
@@ -36,7 +37,9 @@
       [allowAdding]="false"
       [useIcons]="false"
       [confirmDelete]="false"
-    ></dxo-editing>
+    >
+      <dxo-popup [title]="'Add Metal Specification'" [showTitle]="true" [width]="700" [height]="550"></dxo-popup>
+    </dxo-editing>
     <dxo-paging [enabled]="true" [pageSize]="pageSize"> </dxo-paging>
     <dxo-pager
       [visible]="true" [showPageSizeSelector]="true" [showInfo]="true" [showNavigationButtons]="true"
@@ -45,7 +48,7 @@
     </dxo-pager>
 
     <dxi-column caption="action" [width]="125" cellTemplate="buttonrowtemplate" [fixed]="true" fixedPosition="left"></dxi-column>
-    <dxi-column dataField="id" caption="id#" [width]="75"></dxi-column>
+    <dxi-column dataField="id" caption="id#" [width]="75" [allowEditing]="false"></dxi-column>
     <dxi-column dataField="width" caption="paintLine" [width]="85"></dxi-column>
     <dxi-column dataField="thickness" caption="thickness" [width]="85" dataType="number" [format]=fixedformat2 alignment="right"></dxi-column>
     <dxi-column dataField="material"  caption="material" [width]="85"></dxi-column>

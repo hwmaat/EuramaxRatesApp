@@ -1,20 +1,27 @@
 @if (error$ | async; as error) {
-  <div
-    class="error-panel"
-    [ngClass]="error.severity">
-    <div class="error-header">
-      <div class="title">
-        <i [class]="iconClass(error.severity)"></i>
-        <strong>{{ error.title }}</strong>
+  <div class="error-backdrop">
+    <div
+      class="error-panel"
+      [ngClass]="error.severity">
+      <div class="error-header">
+        <div class="title">
+          <i [class]="iconClass(error.severity)"></i>
+          <strong>{{ error.title }}</strong>
+        </div>
       </div>
-      <dx-button
-        icon="close"
-        stylingMode="text"
-        (onClick)="close()">
-      </dx-button>
-    </div>
-    <div class="error-message">
-      {{ error.message }}
+
+      <div class="error-message">
+        {{ error.message }}
+      </div>
+
+      <div class="error-actions">
+        <dx-button
+          text="OK"
+          type="default"
+          stylingMode="contained"
+          (onClick)="close()">
+        </dx-button>
+      </div>
     </div>
   </div>
 }

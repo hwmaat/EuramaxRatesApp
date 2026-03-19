@@ -54,7 +54,8 @@
 		<dxi-column caption="action" [width]="125" cellTemplate="buttonrowtemplate" [fixed]="true" fixedPosition="left"></dxi-column>
         <dxi-column dataField="id" caption="id#" [width]="75"></dxi-column>
 		<dxi-column dataField="finishCode" caption="finishCode" [width]="160"></dxi-column>
-		<dxi-column dataField="paintLine" caption="paintLine" [width]="90"></dxi-column>
+		<dxi-column dataField="productionLineId" caption="id" [width]="90" [visible]="false"></dxi-column>
+		<dxi-column dataField="productionLineCode" caption="paintLine" [width]="90"></dxi-column>
 		<dxi-column dataField="customer" caption="customer" [width]="180"></dxi-column>
 		<dxi-column dataField="customerNumber" caption="customer#" [width]="120"></dxi-column>
 		<dxi-column dataField="substrate" caption="substrate" [width]="110"></dxi-column>
@@ -90,12 +91,42 @@
 						[showColumnLines]="true"
 						[hoverStateEnabled]="false"
 						[rowAlternationEnabled]="true"
-                        [groupPanel]='{ visible: false}'
+						[groupPanel]='{ visible: false}'
 						[searchPanel]='{ visible: false}'>
+						<dxo-master-detail [enabled]="true" template="paintDetail"></dxo-master-detail>
+						<dxi-column dataField="id" caption="id#" [width]="75"></dxi-column>
 						<dxi-column dataField="layerNumber" caption="Layer" [width]="80" dataType="number" alignment="right"></dxi-column>
-						<dxi-column dataField="side" caption="Side" [width]="110"></dxi-column>
 						<dxi-column dataField="layerThickness" caption="Thickness" [width]="110" dataType="number" [format]="fixedformat2" alignment="right"></dxi-column>
-						<dxi-column dataField="paintSystem.name" caption="Paint System" [width]="140"></dxi-column>
+						<dxi-column dataField="paint.paintCode" caption="Paint Code" [width]="140"></dxi-column>
+						<dxi-column dataField="paintSystem.manufacturer.name" caption="Manufacturer" [width]="260"></dxi-column>
+
+						<dxi-column caption="Paints" [width]="80" dataType="number" alignment="right" [calculateCellValue]="paintCount"></dxi-column>
+						<dxi-column width="100%"></dxi-column>
+						<div *dxTemplate="let paintDetail of 'paintDetail'">
+							<div class="production-detail">
+								<div class="production-detail-section">
+									<dx-data-grid
+										[dataSource]="paintDetail.data?.paint ? [paintDetail.data.paint] : []"
+										keyExpr="id"
+										[showBorders]="true"
+										[showColumnLines]="true"
+										[hoverStateEnabled]="false"
+										[rowAlternationEnabled]="true"
+										[groupPanel]='{ visible: false}'
+										[searchPanel]='{ visible: false}'>
+										<dxi-column dataField="id" caption="id#" [width]="75"></dxi-column>
+										<dxi-column dataField="paintCode" caption="Paint Code" [width]="140"></dxi-column>
+										<dxi-column dataField="paintDescription" caption="Description" [minWidth]="220"></dxi-column>
+										<dxi-column dataField="metallicType" caption="Metallic" [width]="120"></dxi-column>
+										<dxi-column dataField="volumeFractionOfSolid" caption="VFoS" [width]="100" dataType="number" [format]="fixedformat2" alignment="right"></dxi-column>
+										<dxi-column dataField="isPrimer" caption="Primer" [width]="90" dataType="boolean"></dxi-column>
+										<dxi-column dataField="isWrinkle" caption="Wrinkle" [width]="90" dataType="boolean"></dxi-column>
+										<dxi-column dataField="isTransparentOrClearCoat" caption="Clear Coat" [width]="110" dataType="boolean"></dxi-column>
+										<dxi-column width="100%"></dxi-column>
+									</dx-data-grid>
+								</div>
+							</div>
+						</div>
 					</dx-data-grid>
 				</div>
 			</div>

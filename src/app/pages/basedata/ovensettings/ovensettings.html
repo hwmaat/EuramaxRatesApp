@@ -24,6 +24,7 @@
     (onEditingStart)="onEditingStart($event)"
     (onInitNewRow)="onInitNewRow($event)"
     (onEditorPreparing)="onEditorPreparing($event)"
+    (onRowValidating)="onRowValidating($event)"
     (onRowUpdating)="rowUpdating($event)"
     (onRowInserting)="rowInserting($event)"
     (onRowRemoving)="onRowRemoving($event)"
@@ -35,23 +36,57 @@
     <dxo-scrolling rowRenderingMode="virtual"> </dxo-scrolling>
     <dxo-selection [mode]="selectionMode" showCheckBoxesMode="onClick" selectAllMode="page" allowSelectAll="true"> </dxo-selection>
     <dxo-editing
-      mode="row"
+      mode="popup"
       [allowUpdating]="true"
       [allowDeleting]="false"
-      [allowAdding]="true"
+      [allowAdding]="false"
       [useIcons]="false"
       [confirmDelete]="false"
     >
       <dxo-popup [title]="'Add Oven Setting'" [showTitle]="true" [width]="700" [height]="550"></dxo-popup>
-      <dxo-form>
-        <dxi-item dataField="paintLine" editorType="dxSelectBox" [editorOptions]="paintLineEditorOptions"></dxi-item>
-        <dxi-item dataField="thickness"></dxi-item>
-        <dxi-item dataField="lineSpeed"></dxi-item>
-        <dxi-item dataField="zone1"></dxi-item>
-        <dxi-item dataField="zone2"></dxi-item>
-        <dxi-item dataField="zone3"></dxi-item>
-        <dxi-item dataField="substrate" editorType="dxSelectBox" [editorOptions]="substrateEditorOptions"></dxi-item>
-        <dxi-item dataField="state" editorType="dxSelectBox" [editorOptions]="stateEditorOptions"></dxi-item>
+      <dxo-form [colCount]="3">
+        <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+          <dxi-item dataField="paintLine" editorType="dxSelectBox" [editorOptions]="paintLineEditorOptions" [isRequired]="true">
+            <dxi-validation-rule type="required" message="Paint line is required."></dxi-validation-rule>
+            <dxi-validation-rule type="stringLength" [max]="50" message="Paint line can be at most 50 characters."></dxi-validation-rule>
+          </dxi-item>
+          <dxi-item dataField="substrate" editorType="dxSelectBox" [editorOptions]="substrateEditorOptions" [isRequired]="true">
+            <dxi-validation-rule type="required" message="Substrate is required."></dxi-validation-rule>
+            <dxi-validation-rule type="stringLength" [max]="50" message="Substrate can be at most 50 characters."></dxi-validation-rule>
+          </dxi-item>
+          <dxi-item dataField="state" editorType="dxSelectBox" [editorOptions]="stateEditorOptions" [isRequired]="true">
+            <dxi-validation-rule type="required" message="State is required."></dxi-validation-rule>
+          </dxi-item>
+        </dxi-item>
+
+        <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+          <dxi-item dataField="thickness" [isRequired]="true">
+            <dxi-validation-rule type="required" message="Thickness is required."></dxi-validation-rule>
+            <dxi-validation-rule type="range" [min]="0.01" [max]="5.0" message="Thickness must be between 0.01 and 5.0."></dxi-validation-rule>
+          </dxi-item>
+          <dxi-item dataField="lineSpeed" editorType="dxNumberBox" [editorOptions]="lineSpeedEditorOptions" [isRequired]="true">
+            <dxi-validation-rule type="required" message="Line speed is required."></dxi-validation-rule>
+            <dxi-validation-rule type="range" [min]="1" [max]="100" message="Line speed must be between 1 and 100."></dxi-validation-rule>
+          </dxi-item>
+          <dxi-item itemType="empty"></dxi-item>
+        </dxi-item>
+
+        <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
+          <dxi-item dataField="zone1" editorType="dxNumberBox" [editorOptions]="zoneEditorOptions" [isRequired]="true">
+            <dxi-validation-rule type="required" message="Zone 1 is required."></dxi-validation-rule>
+            <dxi-validation-rule type="range" [min]="0" [max]="500" message="Zone 1 must be an integer between 0 and 500."></dxi-validation-rule>
+          </dxi-item>
+          <dxi-item dataField="zone2" editorType="dxNumberBox" [editorOptions]="zoneEditorOptions" [isRequired]="true">
+            <dxi-validation-rule type="required" message="Zone 2 is required."></dxi-validation-rule>
+            <dxi-validation-rule type="range" [min]="0" [max]="500" message="Zone 2 must be an integer between 0 and 500."></dxi-validation-rule>
+          </dxi-item>
+          <dxi-item dataField="zone3" editorType="dxNumberBox" [editorOptions]="zoneEditorOptions" [isRequired]="true">
+            <dxi-validation-rule type="required" message="Zone 3 is required."></dxi-validation-rule>
+            <dxi-validation-rule type="range" [min]="0" [max]="500" message="Zone 3 must be an integer between 0 and 500."></dxi-validation-rule>
+          </dxi-item>
+        </dxi-item>
+
+
       </dxo-form>
     </dxo-editing>
     <dxo-paging [enabled]="true" [pageSize]="pageSize"> </dxo-paging>
@@ -64,15 +99,23 @@
   <dxi-column type="buttons" [visible]="false"></dxi-column>
     <dxi-column caption="action" [width]="125" cellTemplate="buttonrowtemplate" [fixed]="true" fixedPosition="left"></dxi-column>
     <dxi-column dataField="id" caption="id#" [width]="75" [allowEditing]="false"></dxi-column>
-    <dxi-column dataField="paintLine" caption="paintLine" [width]="85"></dxi-column>
+    <dxi-column dataField="productionLineId" caption="productionLineId" [width]="85" [visible]="false"></dxi-column>
+    <dxi-column dataField="productionLineCode" caption="paintLine" [width]="85"></dxi-column>
     <dxi-column dataField="thickness" caption="thickness" [width]="85" dataType="number" [format]=fixedformat2 alignment="right"></dxi-column>
     <dxi-column dataField="lineSpeed" caption="lineSpeed" [width]="85" dataType="number" format="#,##0" alignment="right"></dxi-column>
-    <dxi-column dataField="zone1"  caption="zone1" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true"></dxi-column>
-    <dxi-column dataField="zone2"  caption="zone2" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true"></dxi-column>
-    <dxi-column dataField="zone3"  caption="zone3" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true"></dxi-column>
+    <dxi-column dataField="zone1"  caption="zone1" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true">
+      <dxi-validation-rule type="range" [min]="0" [max]="500" message="Zone 1 must be an integer between 0 and 500."></dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="zone2"  caption="zone2" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true">
+      <dxi-validation-rule type="range" [min]="0" [max]="500" message="Zone 2 must be an integer between 0 and 500."></dxi-validation-rule>
+    </dxi-column>
+    <dxi-column dataField="zone3"  caption="zone3" [width]="85" dataType="number" format="#,##0" alignment="right" [allowEditing]="true">
+      <dxi-validation-rule type="range" [min]="0" [max]="500" message="Zone 3 must be an integer between 0 and 500."></dxi-validation-rule>
+    </dxi-column>
     <dxi-column dataField="substrate"  caption="substrate" [width]="85"></dxi-column>
     <dxi-column dataField="state"  caption="state" [width]="95">
       <dxo-lookup [dataSource]="stateOptions"></dxo-lookup>
+      <dxi-validation-rule type="required" message="State is required."></dxi-validation-rule>
     </dxi-column>
     <dxi-column dataField="" width="100%" caption=""></dxi-column>  
 

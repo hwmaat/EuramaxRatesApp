@@ -10,7 +10,8 @@ import { WithDestroy } from '@app/helpers/WithDestroy';
 interface FinishForm {
   id: number | null;
   finishCode: string;
-  paintLine: string;
+  productionLineId?: number | null;
+  productionLineCode?: string | null;
   customer: string;
   customerNumber: string;
   substrate: string;
@@ -100,7 +101,8 @@ export class FinishDetails extends WithDestroy() {
     return {
       id: null,
       finishCode: '',
-      paintLine: '',
+      productionLineId: null,
+      productionLineCode: '',
       customer: '',
       customerNumber: '',
       substrate: '',
@@ -126,7 +128,8 @@ export class FinishDetails extends WithDestroy() {
     return {
       id: data.id ?? null,
       finishCode: data.finishCode ?? '',
-      paintLine: data.paintLine ?? '',
+      productionLineId: data.productionLineId ?? null,
+      productionLineCode: data.productionLineCode ?? '',
       customer: data.customer ?? '',
       customerNumber: data.customerNumber ?? '',
       substrate: data.substrate ?? '',

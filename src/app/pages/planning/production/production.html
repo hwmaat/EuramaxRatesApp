@@ -57,13 +57,20 @@
     </dxi-item>    
     <dxi-item location="before">
       <div *dxTemplate class="toolbar-item-container">
-        <div class="toolbar-label">CampaignNrs: </div>
+        <div class="toolbar-label campaign-label-with-spinner">
+          <span>CampaignNrs:</span>
+          @if (isCampaignNumbersLoading) {
+            <dx-load-indicator [height]="16" [width]="16"></dx-load-indicator>
+          }
+        </div>
         <dx-tag-box
           [dataSource]="campaignNumbers"
           [(value)]="selectedCampaignNumbers"
           displayExpr="description"
           valueExpr="campaignNumber"
-          placeholder="Select campaignNr(s)"
+          [placeholder]="isCampaignNumbersLoading ? 'Loading campaignNr(s)...' : 'Select campaignNr(s)'"
+          [noDataText]="isCampaignNumbersLoading ? 'Loading campaign numbers...' : 'No campaign numbers found'"
+          [disabled]="isCampaignNumbersLoading"
           [searchEnabled]="true"
           [showSelectionControls]="true"
           [width]="240"

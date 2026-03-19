@@ -38,6 +38,16 @@ readonly substrateEditorOptions: Record<string, unknown> = {
 readonly stateEditorOptions: Record<string, unknown> = {
   items: this.stateOptions,
 };
+readonly lineSpeedEditorOptions: Record<string, unknown> = {
+  showSpinButtons: true,
+  step: 1,
+  format: '#,##0',
+};
+readonly zoneEditorOptions: Record<string, unknown> = {
+  showSpinButtons: true,
+  step: 1,
+  format: '#,##0',
+};
 private lookups = inject(LookupsService);
 private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lineSpeed', 'substrate']);
 
@@ -48,7 +58,7 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     this.entityName = 'OvenSettingDto';
     this.recordIdField = "id";
     this.showColumnLinesSwitch=true;
-    this.showInlineEditButton = true;
+    this.showInlineEditButton = false;
     this.showGridCaption=false;
     this.showAddButton=true;
     this.showTreeButton=true;
@@ -75,7 +85,7 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
  public ngAfterViewInit(): void {
     this.showExportButton=true;
     this.showTreeButton=true;
-    this.editInline = true;
+   this.editInline = false;
  }
   public override refresh(): void {
     this.records = [];
@@ -105,7 +115,6 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
 
   ResetEdit() {
       this.editMode = EditMode.Read;
-      this.gridx?.instance.option('editing.mode', 'row');
   }
 
   SaveRecord = (_e?: unknown) => {
@@ -126,26 +135,84 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
       this.substrateOptions.splice(0, this.substrateOptions.length, ...(substrates ?? []));
 
       this.editMode = EditMode.Add;
-      this.gridx.instance.option('editing.mode', 'popup');
       this.gridx.instance.addRow();
     });
   }
 
   onRowInserted(_e?: unknown): void {
     this.editMode = EditMode.Read;
-    this.gridx?.instance.option('editing.mode', 'row');
   }
 
   onInitNewRow(_e?: unknown): void {
     this.editMode = EditMode.Add;
-    this.gridx?.instance.option('editing.mode', 'popup');
   }
 
   onEditingStart(e: { data?: { id?: unknown } }): void {
     if (e?.data?.id) {
       this.editMode = EditMode.Edit;
-      this.gridx?.instance.option('editing.mode', 'row');
     }
+  }
+
+  onRowValidating(e: {
+    newData?: Partial<OvenSettingDto>;
+    oldData?: Partial<OvenSettingDto>;
+    isValid?: boolean;
+    errorText?: string;
+  }): void {
+    const merged: Partial<OvenSettingDto> = {
+      ...(e.oldData ?? {}),
+      ...(e.newData ?? {}),
+    };
+
+    const validationErrors: string[] = [];
+
+    const paintLine = (merged.productionLineId ?? '');
+    if (!paintLine) {
+      validationErrors.push('Paint line is required.');
+    }
+
+    const substrate = (merged.substrate ?? '').trim();
+    if (!substrate) {
+      validationErrors.push('Substrate is required.');
+    } else if (substrate.length > 50) {
+      validationErrors.push('Substrate can be at most 50 characters.');
+    }
+
+    if (typeof merged.thickness !== 'number' || Number.isNaN(merged.thickness) || merged.thickness < 0.01 || merged.thickness > 5.0) {
+      validationErrors.push('Thickness must be between 0.01 and 5.0.');
+    }
+
+    if (!this.isIntegerInRange(merged.lineSpeed, 1, 2147483647)) {
+      validationErrors.push('Line speed must be an integer between 1 and 2147483647.');
+    }
+
+    if (!this.isIntegerInRange(merged.zone1, 0, 500)) {
+      validationErrors.push('Zone 1 must be an integer between 0 and 500.');
+    }
+
+    if (!this.isIntegerInRange(merged.zone2, 0, 500)) {
+      validationErrors.push('Zone 2 must be an integer between 0 and 500.');
+    }
+
+    if (!this.isIntegerInRange(merged.zone3, 0, 500)) {
+      validationErrors.push('Zone 3 must be an integer between 0 and 500.');
+    }
+
+    if (!merged.state || !this.stateOptions.includes(merged.state)) {
+      validationErrors.push('State must be Trial, Released, Blocked, or Archived.');
+    }
+
+    if (typeof merged.version === 'string' && merged.version.length > 50) {
+      validationErrors.push('Version can be at most 50 characters.');
+    }
+
+    if (validationErrors.length > 0) {
+      e.isValid = false;
+      e.errorText = validationErrors.join('\n');
+      return;
+    }
+
+    e.isValid = true;
   }
 
   onEditorPreparing(e: {
@@ -180,10 +247,49 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
         : 'Geen substrates beschikbaar';
     }
 
+    if (e.dataField === 'lineSpeed') {
+      e.editorName = 'dxNumberBox';
+      e.editorOptions = {
+        ...(e.editorOptions || {}),
+        showSpinButtons: true,
+        step: 1,
+        format: '#,##0',
+      };
+    }
+
+    if (e.dataField === 'zone1' || e.dataField === 'zone2' || e.dataField === 'zone3') {
+      e.editorName = 'dxNumberBox';
+      e.editorOptions = {
+        ...(e.editorOptions || {}),
+        showSpinButtons: true,
+        step: 1,
+        format: '#,##0',
+      };
+    }
+
     if (this.addOnlyEditableFields.has(e.dataField)) {
       e.editorOptions = e.editorOptions || {};
       e.editorOptions['readOnly'] = !isNewRow;
     }
+  }
+
+  public override rowInserting = (e: {
+    data: Partial<OvenSettingDto>;
+    cancel?: boolean | PromiseLike<boolean> | PromiseLike<void>;
+  }): void => {
+    const payload = this.toCreatePayload(e.data);
+    const result = firstValueFrom(this.api.post<OvenSettingDto>(this.entityEndpoint, payload));
+
+    e.cancel = new Promise<boolean>((resolve) => {
+      result.then((created) => {
+        resolve(false);
+        e.data = created;
+        this.editMode = EditMode.Read;
+      })
+      .catch(() => {
+        resolve(true);
+      });
+    });
   }
 
   public override rowUpdating(e: {
@@ -192,6 +298,24 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     cancel?: boolean | PromiseLike<boolean> | PromiseLike<void>;
   }): void {
     const updated: Partial<OvenSettingDto> = { ...e.oldData, ...e.newData };
+
+    if (updated.id === undefined || updated.id === null) {
+      const createPayload = this.toCreatePayload(updated);
+      const createResult = firstValueFrom(this.api.post<OvenSettingDto>(this.entityEndpoint, createPayload));
+
+      e.cancel = new Promise<boolean>((resolve) => {
+        createResult.then((created) => {
+          resolve(false);
+          e.newData = created;
+          this.editMode = EditMode.Read;
+        })
+        .catch(() => {
+          resolve(true);
+        });
+      });
+      return;
+    }
+
     const patchDto: OvenSettingsPatchDto = {
       state: updated.state,
       zone1: updated.zone1 ?? null,
@@ -201,35 +325,26 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
 
     const result = firstValueFrom(this.api.patch<OvenSettingDto>(`${this.entityEndpoint}/${updated.id}`, patchDto));
 
-    e.cancel = new Promise<boolean>((resolve, reject) => {
+    e.cancel = new Promise<boolean>((resolve) => {
       result.then((patched) => {
         resolve(false);
         e.newData = patched;
         this.editMode = EditMode.Read;
       })
-      .catch((err) => {
-        console.error('ovensettings rowUpdating Patch failed', err);
-        reject(err?.message || 'Unknown error');
-        this.editMode = EditMode.Read;
+      .catch(() => {
+        resolve(true);
       });
     });
   }
 
   EditRecord = (e: InlineEditEvent<{ option: (name: string, value: string) => void; editRow: (rowIndex: number) => void }>) => {
-    
-    if (this.editInline){
-      this.startInlineEdit(e);
-    } else {
-        // this.euravibDovetailImport = { ...e.row?.data };
-        // this.popupVisible = true;
-    }
+    this.startInlineEdit(e);
   }
 
   startInlineEdit(e: InlineEditEvent<{ option: (name: string, value: string) => void; editRow: (rowIndex: number) => void }>) {
     const rowIndex = e.rowIndex;
     const grid = e.component;
     this.editMode = EditMode.Edit;
-    grid.option('editing.mode', 'row');
     grid.editRow(rowIndex);
   }
 
@@ -246,5 +361,26 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
   CancelEdit = (_e?: unknown) => {
     this.gridx.instance.cancelEditData();
     this.editMode = EditMode.Read;
+  }
+
+  private isIntegerInRange(value: unknown, min: number, max: number): boolean {
+    return typeof value === 'number'
+      && Number.isInteger(value)
+      && value >= min
+      && value <= max;
+  }
+
+  private toCreatePayload(source: Partial<OvenSettingDto>): Omit<OvenSettingDto, 'id'> {
+    return {
+      productionLineId: (source.productionLineId ?? null),
+      thickness: source.thickness ?? 0,
+      lineSpeed: source.lineSpeed ?? 0,
+      zone1: source.zone1 ?? 0,
+      zone2: source.zone2 ?? 0,
+      zone3: source.zone3 ?? 0,
+      substrate: (source.substrate ?? '').trim(),
+      state: (source.state ?? 'Trial') as OvenSettingState,
+      ...(source.version !== undefined ? { version: source.version } : {}),
+    };
   }
 }

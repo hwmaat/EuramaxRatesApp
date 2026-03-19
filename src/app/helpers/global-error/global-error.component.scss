@@ -1,3 +1,10 @@
+.error-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  z-index: 1999;
+}
+
 .error-panel {
   position: fixed;
   top: 50%;
@@ -29,6 +36,13 @@
   .error-message {
     margin-top: 8px;
     line-height: 1.4;
+    white-space: pre-line;
+  }
+
+  .error-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
   }
   &.info {
     background: var(--info-bg);

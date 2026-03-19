@@ -1,0 +1,12 @@
+.paintselected-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 12px;
+}
+
+.paintselected-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
