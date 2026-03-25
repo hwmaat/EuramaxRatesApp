@@ -350,6 +350,30 @@ constructor() {
 
     }
 
+    protected navigateAndFocusRow(rowId: number): void {
+      if (rowId === null || rowId === undefined) {
+        return;
+      }
+
+      const grid = this.gridx?.instance;
+      if (!grid) {
+        return;
+      }
+
+      const applyFocus = (): void => {
+        grid.option('focusedRowKey', rowId);
+        grid.selectRows([rowId], false);
+      };
+
+      const navigation = grid.navigateToRow(rowId) as PromiseLike<void> | void;
+      if (navigation && typeof (navigation as PromiseLike<void>).then === 'function') {
+        navigation.then(() => applyFocus());
+        return;
+      }
+
+      applyFocus();
+    }
+
     afterSave(): void {
       // Hook for child components to override
     }

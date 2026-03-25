@@ -19,6 +19,7 @@ export class Productionlines extends BaseGrid<ProductionLineDto> implements OnIn
   readonly EditMode = EditMode;
   loadingMessage = 'loading....';
   selectedRowKeys: number[] = [];
+  private pendingInsertedRowId: number | null = null;
   editingMode: 'row' | 'popup' = 'row';
 
   constructor() {
@@ -35,6 +36,7 @@ export class Productionlines extends BaseGrid<ProductionLineDto> implements OnIn
   }
 
   ngOnInit(): void {
+    this.refresh();
   }
 
   public ngAfterViewInit(): void {
@@ -77,6 +79,7 @@ export class Productionlines extends BaseGrid<ProductionLineDto> implements OnIn
       result.then((created) => {
         resolve(false);
         e.data = created;
+        this.pendingInsertedRowId = created.id;
         this.editMode = EditMode.Read;
       })
       .catch((err) => {
@@ -84,6 +87,7 @@ export class Productionlines extends BaseGrid<ProductionLineDto> implements OnIn
         const message = err?.error?.detail || err?.error?.title || err?.message || 'Saving production line failed.';
         notify(message, 'error', 5000);
         reject(err?.message || 'Unknown error');
+        this.pendingInsertedRowId = null;
         this.editMode = EditMode.Read;
         this.editingMode = 'row';
       });
@@ -149,9 +153,21 @@ export class Productionlines extends BaseGrid<ProductionLineDto> implements OnIn
     }
   }
 
-  onRowInserted(_e?: unknown): void {
+  onRowInserted(e?: { key?: unknown; data?: { id?: number | null } }): void {
     this.editMode = EditMode.Read;
     this.editingMode = 'row';
+
+    const insertedId = (typeof e?.key === 'number' ? e.key : null)
+      ?? (typeof e?.data?.id === 'number' ? e.data.id : null)
+      ?? this.pendingInsertedRowId;
+
+    this.pendingInsertedRowId = null;
+    if (insertedId === null || insertedId === undefined) {
+      return;
+    }
+
+    this.selectedRowKeys = [insertedId];
+    this.navigateAndFocusRow(insertedId);
   }
 
   EditRecord = (e: InlineEditEvent): void => {

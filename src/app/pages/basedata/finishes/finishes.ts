@@ -31,6 +31,7 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
   readonly EditMode = EditMode;
   loadingMessage = 'loading....';
   selectedRowKeys: number[] = [];
+  private pendingInsertedRowId: number | null = null;
   isAddPopupVisible = false;
   isUpdatePopupVisible = false;
   stateOptions: string[] = ['Trial', 'Released', 'Blocked', 'Archived'];
@@ -56,7 +57,7 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
   }
 
   ngOnInit(): void {
-    // Base grid loads data via toolbar actions.
+    this.refresh();
   }
 
   ngAfterViewInit(): void {
@@ -73,6 +74,11 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
       .subscribe({
         next: (result) => {
           this.records = result ?? [];
+          if (this.pendingInsertedRowId !== null) {
+            this.selectedRowKeys = [this.pendingInsertedRowId];
+            this.navigateAndFocusRow(this.pendingInsertedRowId);
+            this.pendingInsertedRowId = null;
+          }
           this.loading = false;
         },
         error: (err) => {
@@ -147,9 +153,10 @@ export class Finishes extends BaseGrid<FinishDto> implements OnInit, AfterViewIn
     this.editMode = EditMode.Read;
   }
 
-  onAddPopupSaved(): void {
+  onAddPopupSaved(insertedId: number | null): void {
     this.isAddPopupVisible = false;
     this.editMode = EditMode.Read;
+    this.pendingInsertedRowId = insertedId;
     this.refresh();
   }
 

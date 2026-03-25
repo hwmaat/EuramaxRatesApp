@@ -46,9 +46,8 @@
       <dxo-popup [title]="'Add Oven Setting'" [showTitle]="true" [width]="700" [height]="550"></dxo-popup>
       <dxo-form [colCount]="3">
         <dxi-item itemType="group" [colCount]="3" [colSpan]="3">
-          <dxi-item dataField="paintLine" editorType="dxSelectBox" [editorOptions]="paintLineEditorOptions" [isRequired]="true">
+          <dxi-item dataField="productionLineId" editorType="dxSelectBox" [editorOptions]="paintLineEditorOptions" [isRequired]="true">
             <dxi-validation-rule type="required" message="Paint line is required."></dxi-validation-rule>
-            <dxi-validation-rule type="stringLength" [max]="50" message="Paint line can be at most 50 characters."></dxi-validation-rule>
           </dxi-item>
           <dxi-item dataField="substrate" editorType="dxSelectBox" [editorOptions]="substrateEditorOptions" [isRequired]="true">
             <dxi-validation-rule type="required" message="Substrate is required."></dxi-validation-rule>
@@ -117,6 +116,7 @@
       <dxo-lookup [dataSource]="stateOptions"></dxo-lookup>
       <dxi-validation-rule type="required" message="State is required."></dxi-validation-rule>
     </dxi-column>
+    <dxi-column dataField="version"  caption="version" [width]="85"></dxi-column>
     <dxi-column dataField="" width="100%" caption=""></dxi-column>  
 
     <div  *dxTemplate="let data of 'buttonrowtemplate'">

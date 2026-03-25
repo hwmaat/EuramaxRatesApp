@@ -5,6 +5,7 @@ import { BaseGrid } from '@app/helpers/basegrid';
 import { EditMode } from '@app/models/enum';
 import { DeleteRecordEvent, InlineEditEvent, RowRemovingEvent, SelectionChangedEvent } from '@app/models/grid-events.model';
 import { OvenSettingDto, OvenSettingsPatchDto, OvenSettingState } from '@app/models/ovensetting.model';
+import { ProductionLine } from '@app/models/productionlines.options';
 import { LookupsService } from '@app/services/lookups.service';
 import { DxButtonModule, DxDataGridModule, DxSelectBoxModule, DxToolbarModule } from 'devextreme-angular';
 import { firstValueFrom } from 'rxjs';
@@ -20,11 +21,14 @@ export class Ovensettings extends BaseGrid<OvenSettingDto> implements OnInit, Af
 readonly EditMode = EditMode;
 loadingMessage = "loading....";
 selectedRowKeys: number[] = [];
+private pendingInsertedRowId: number | null = null;
 readonly stateOptions: OvenSettingState[] = ['Trial', 'Released', 'Blocked', 'Archived'];
-paintLineOptions: string[] = [];
+paintLineOptions: ProductionLine[] = [];
 substrateOptions: string[] = [];
 readonly paintLineEditorOptions: Record<string, unknown> = {
   items: this.paintLineOptions,
+  displayExpr: 'productionLine',
+  valueExpr: 'id',
   searchEnabled: true,
   showClearButton: true,
   placeholder: 'Geen productielijnen beschikbaar',
@@ -49,7 +53,7 @@ readonly zoneEditorOptions: Record<string, unknown> = {
   format: '#,##0',
 };
 private lookups = inject(LookupsService);
-private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lineSpeed', 'substrate']);
+private readonly addOnlyEditableFields = new Set(['productionLineId', 'thickness', 'lineSpeed', 'substrate']);
 
 
   constructor(){
@@ -68,10 +72,11 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
  ngOnInit(): void {
    this.loadPaintLineOptions();
    this.loadSubstrateOptions();
+   this.refresh();
  }
 
  private loadPaintLineOptions(): void {
-   firstValueFrom(this.lookups.getProductionLineNames()).then((items) => {
+   firstValueFrom(this.lookups.getProductionLines()).then((items) => {
     this.paintLineOptions.splice(0, this.paintLineOptions.length, ...(items ?? []));
    });
  }
@@ -124,7 +129,7 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     const loadLookups = Promise.all([
       this.paintLineOptions.length > 0
         ? Promise.resolve(this.paintLineOptions)
-        : firstValueFrom(this.lookups.getProductionLineNames()),
+        : firstValueFrom(this.lookups.getProductionLines()),
       this.substrateOptions.length > 0
         ? Promise.resolve(this.substrateOptions)
         : firstValueFrom(this.lookups.getSubstrates()),
@@ -139,8 +144,21 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
     });
   }
 
-  onRowInserted(_e?: unknown): void {
+  onRowInserted(e?: { key?: unknown; data?: { id?: number | null } }): void {
     this.editMode = EditMode.Read;
+
+    const insertedId = (typeof e?.key === 'number' ? e.key : null)
+      ?? (typeof e?.data?.id === 'number' ? e.data.id : null)
+      ?? this.pendingInsertedRowId;
+
+    if (insertedId === null || insertedId === undefined) {
+      this.pendingInsertedRowId = null;
+      return;
+    }
+
+    this.pendingInsertedRowId = null;
+    this.selectedRowKeys = [insertedId];
+    this.navigateAndFocusRow(insertedId);
   }
 
   onInitNewRow(_e?: unknown): void {
@@ -225,10 +243,12 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
 
     const isNewRow = !!e.row?.isNewRow || this.editMode === EditMode.Add;
 
-    if (e.dataField === 'paintLine') {
+    if (e.dataField === 'productionLineId') {
       e.editorName = 'dxSelectBox';
       e.editorOptions = e.editorOptions || {};
       e.editorOptions['items'] = this.paintLineOptions;
+      e.editorOptions['displayExpr'] = 'productionLine';
+      e.editorOptions['valueExpr'] = 'id';
       e.editorOptions['searchEnabled'] = true;
       e.editorOptions['showClearButton'] = true;
       e.editorOptions['placeholder'] = this.paintLineOptions.length > 0
@@ -284,9 +304,11 @@ private readonly addOnlyEditableFields = new Set(['paintLine', 'thickness', 'lin
       result.then((created) => {
         resolve(false);
         e.data = created;
+        this.pendingInsertedRowId = created.id;
         this.editMode = EditMode.Read;
       })
       .catch(() => {
+        this.pendingInsertedRowId = null;
         resolve(true);
       });
     });

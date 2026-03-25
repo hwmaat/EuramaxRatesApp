@@ -30,7 +30,7 @@ export class Paints extends BaseGrid<PaintDto> implements OnInit, AfterViewInit 
   }
 
   ngOnInit(): void {
-    // Base grid loads data via toolbar actions.
+    this.refresh();
   }
 
   ngAfterViewInit(): void {

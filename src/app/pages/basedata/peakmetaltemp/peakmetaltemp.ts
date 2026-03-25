@@ -34,7 +34,7 @@ export class Peakmetaltemp extends BaseGrid<PmtOffsetDto> implements OnInit, Aft
   }
 
   ngOnInit(): void {
-    // Base grid loads data via toolbar actions.
+    this.refresh();
   }
 
   ngAfterViewInit(): void {

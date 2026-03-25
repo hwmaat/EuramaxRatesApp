@@ -67,7 +67,7 @@ export class FinishesAdd {
   visible = input<boolean>(false);
 
   closed = output<void>();
-  saved = output<void>();
+  saved = output<number | null>();
 
   loading = false;
   isPaintSelectorVisible = false;
@@ -104,10 +104,10 @@ export class FinishesAdd {
     this.loading = true;
     const payload = this.toCreatePayload(this.model);
 
-    firstValueFrom(this.api.post('paintlayer-recipes', payload))
-      .then(() => {
+    firstValueFrom(this.api.post<{ id?: number | null }>('paintlayer-recipes', payload))
+      .then((created) => {
         this.model = this.createEmptyRecipe();
-        this.saved.emit();
+        this.saved.emit(typeof created?.id === 'number' ? created.id : null);
       })
       .catch((err) => {
         console.error('Create finish failed', err);

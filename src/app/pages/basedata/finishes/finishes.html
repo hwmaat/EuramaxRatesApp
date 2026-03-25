@@ -140,7 +140,7 @@
 	<app-finishes-add
 		[visible]="isAddPopupVisible"
 		(closed)="onAddPopupClosed()"
-		(saved)="onAddPopupSaved()">
+		(saved)="onAddPopupSaved($event)">
 	</app-finishes-add>
 
 	<dx-popup

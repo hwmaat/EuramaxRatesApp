@@ -35,7 +35,7 @@ selectedRowKeys: number[] = [];
 }
 
  ngOnInit(): void {
-
+  this.refresh();
  }
 
  public ngAfterViewInit(): void {
@@ -82,9 +82,19 @@ selectedRowKeys: number[] = [];
     this.gridx.instance.addRow();
   }
 
-  onRowInserted(_e?: unknown): void {
+  onRowInserted(e?: { key?: unknown; data?: { id?: number | null } }): void {
     this.editMode = EditMode.Read;
     this.gridx?.instance.option('editing.mode', 'row');
+
+    const insertedId = (typeof e?.key === 'number' ? e.key : null)
+      ?? (typeof e?.data?.id === 'number' ? e.data.id : null);
+
+    if (insertedId === null || insertedId === undefined) {
+      return;
+    }
+
+    this.selectedRowKeys = [insertedId];
+    this.navigateAndFocusRow(insertedId);
   }
 
   EditRecord = (e: InlineEditEvent) => {
