@@ -1,13 +1,12 @@
 {
-  "apiBaseUrl": "https://AppPortal.euramax.eu:8280/",
-  "appBaseUrl": "https://AppPortal.euramax.eu/clientorders",
-  "authPingEndpoint": "/chemical-pretreatments",
-  "client":"Euramax",
-  "backgroundImage":"EuramaxBackground.jpg",
-  "logo":"EuramaxLogo_light.png",
-  "theme":"dark",
-  "title":"Euramax Production Portal",
-  "defaultBaanAdministration":"130",
-  "version":"1.0.0.1",
-  "apiKey": "D4D06433-96B8-4AE3-BA98-91E7351DD76C"
+  "apiBaseUrl": "https://api.example.com",
+  "appBaseUrl": "https://app.example.com/",
+  "authPingEndpoint": "/health",
+  "client": "Angular Starter",
+  "backgroundImage": "backgrounda.jpg",
+  "logo": "",
+  "theme": "dark",
+  "title": "Angular Base Shell",
+  "version": "1.0.0",
+  "apiKey": "REPLACE_WITH_API_KEY"
 }

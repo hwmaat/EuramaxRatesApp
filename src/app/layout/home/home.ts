@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-
-//import { ThemeService } from '@app/services/theme.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,9 +8,4 @@ import { CommonModule } from '@angular/common';
   styleUrl: './home.scss',
 })
 export class Home {
-
-  ngOnInit(): void {
-
-  }
-
 }
