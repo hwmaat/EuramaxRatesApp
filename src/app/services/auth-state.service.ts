@@ -23,7 +23,7 @@ export class AuthStateService {
       // - is fast
       // - does not have side effects
       // Example: GET /health or /ping or /version
-      const endpoint = this.globals.settings()?.authPingEndpoint ?? '/chemical-pretreatments';
+      const endpoint = this.globals.settings()?.authPingEndpoint ?? '/health';
       await firstValueFrom(this.api.pingWhenReady(endpoint));
       this.status.set('authenticated');
     } catch {

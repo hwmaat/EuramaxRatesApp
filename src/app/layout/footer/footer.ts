@@ -1,4 +1,4 @@
-import { Component, effect, EventEmitter, inject, Input, Output } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 
 import { DxSwitchModule, DxButtonModule } from 'devextreme-angular';
 import { signal } from '@angular/core';
@@ -22,7 +22,6 @@ export class Footer extends WithDestroy() {
   private globals = inject(Globals);
   auth = inject(AuthStateService);
   username = signal<string | null>(null);
-  administratie = "test";
   themeValue = true; // true for dark theme, false for light theme
   baseUrl='';
   version = '';
@@ -39,7 +38,6 @@ export class Footer extends WithDestroy() {
     effect(() => {
     const s = this.globals.settings();   // IAppConfig | null
     if (s) {
-      this.administratie = s.defaultBaanAdministration;
       this.version = s.version;
     }
 

@@ -11,7 +11,6 @@ export function validateConfig(config: IAppConfig): void {
     'logo',
     'theme',
     'version',
-    'defaultBaanAdministration',
     'apiKey'
   ];
 

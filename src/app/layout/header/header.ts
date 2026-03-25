@@ -25,8 +25,8 @@ export class Header extends WithDestroy() {
   private globals = inject(Globals);
   readonly logoUrl = computed(() => {
     const cfg = this.globals.settings();
-    const file = cfg?.logo ?? 'EuramaxLogo_light.png';
-    return `assets/${file}`;
+    const file = cfg?.logo ?? '';
+    return file ? `assets/${file}` : '';
   });
   
   constructor() {

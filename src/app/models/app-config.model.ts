@@ -8,6 +8,5 @@ export interface IAppConfig {
   theme:string;
   title:string;
   version:string;
-  defaultBaanAdministration:string;
   apiKey: string;
 }
