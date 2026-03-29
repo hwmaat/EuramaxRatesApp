@@ -11,6 +11,11 @@ export const routes: Routes = [
   { path: '', component: Bootstrap, canActivate: [bootstrapGuard], pathMatch: 'full', data: { caption: '' } },
   { path: 'login', component: Login, data: { caption: 'Login' } },
   { path: 'home', component: Home, canActivate: [authGuard], data: { caption: 'Home' } },
+  {
+    path: 'pages',
+    canActivate: [authGuard],
+    loadChildren: () => import('./pages/pages.routes').then((m) => m.PAGES_ROUTES)
+  },
   { path: 'authentication-failed', component: AuthenticationFailed, data: { caption: 'Authentication Failed' } },
   { path: '**', redirectTo: '' }
 ];

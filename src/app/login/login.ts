@@ -22,23 +22,26 @@ export class Login {
 
   readonly canSubmit = computed(() => !this.submitting() && this.apiKey.trim().length > 0);
 
+  ngOnInit(): void {
+    this.apiKey = this.globals.settings()?.apiKey ?? '';
+  }
+
   async submit(): Promise<void> {
     if (!this.canSubmit()) {
       return;
     }
 
     const settings = this.globals.settings();
-
-    this.apiKey = settings.apiKey || '';
-    console.log('login ==> this.apiKey', this.apiKey);
     this.submitting.set(true);
     this.errorMessage.set(null);
 
     try {
-      this.globals.setSettings({
-        ...settings,
-        apiKey: this.apiKey.trim()
-      });
+      if (settings) {
+        this.globals.setSettings({
+          ...settings,
+          apiKey: this.apiKey.trim()
+        });
+      }
 
       await this.authState.init();
 

@@ -1,0 +1,13 @@
+<div class="base-currency-select">
+  <span>Base Currency:</span>
+  <dx-select-box
+    [dataSource]="currencyOptions"
+    valueExpr="code"
+    displayExpr="display"
+    [searchEnabled]="true"
+    [showClearButton]="false"
+    [value]="selectedCurrency()"
+    [width]="240"
+    (onValueChanged)="onValueChanged($event)">
+  </dx-select-box>
+</div>

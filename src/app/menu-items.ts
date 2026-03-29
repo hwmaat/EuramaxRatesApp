@@ -17,5 +17,22 @@ export const menuItems: MenuItem[] = [
     path: '/home',
     icon: 'mdi mdi-home',
     access: [ACCESS.ALL]
+  },
+  {
+    text: 'Prices',
+    icon: 'mdi mdi-currency-usd',
+    access: [ACCESS.ALL],
+    items: [
+      {
+        text: 'Metalprice',
+        path: '/pages/metalprice',
+        access: [ACCESS.ALL]
+      },
+      {
+        text: 'Forexrate',
+        path: '/pages/forexrate',
+        access: [ACCESS.ALL]
+      }
+    ]
   }
 ];

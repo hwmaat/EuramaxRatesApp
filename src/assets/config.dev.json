@@ -1,13 +1,13 @@
 {
-  "apiBaseUrl": "https://api.example.com",
+  "apiBaseUrl": "https://localhost:7221/api",
   "appBaseUrl": "https://localhost:4200/",
-  "authPingEndpoint": "/health",
+  "authPingEndpoint": "/Test/ping",
   "client": "Angular Starter",
   "backgroundImage": "backgrounda.jpg",
-  "logo": "",
+  "logo": "EuramaxLogo_light.png",
   "theme": "dark",
-  "title": "Angular Base Shell",
+  "title": "Rates App",
   "version": "1.0.0",
-  "apiKey": "REPLACE_WITH_API_KEY"
+  "apiKey": "6XZGKdwKTjhf9XsQzVybhLogl6ECptwA62VEgPX84Z0erDFED4SACLrlLrrW1vIj"
 }
 

@@ -1,0 +1,23 @@
+<app-page-shell>
+  <dx-toolbar class="ams-toolbar" page-toolbar>
+    <dxi-item location="before">
+      <div class="toolbar-title">Forexrate</div>
+    </dxi-item>
+    <dxi-item location="after">
+      <app-base-currency-select></app-base-currency-select>
+    </dxi-item>
+    <dxi-item location="after">
+      <dx-button
+        text="Refresh"
+        icon="refresh"
+        stylingMode="contained"
+        type="default"
+        (onClick)="refreshRates()">
+      </dx-button>
+    </dxi-item>
+  </dx-toolbar>
+
+  <div page-content>
+    <p>Page scaffold is ready. Details will be added later.</p>
+  </div>
+</app-page-shell>

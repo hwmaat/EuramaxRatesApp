@@ -1,0 +1,137 @@
+<app-page-shell>
+  <dx-toolbar class="ams-toolbar" page-toolbar>
+    <dxi-item location="before">
+      <div class="toolbar-title">Metalprice</div>
+    </dxi-item>
+    <dxi-item location="after">
+      <app-base-currency-select (currencyChanged)="onBaseCurrencyChanged($event)"></app-base-currency-select>
+    </dxi-item>
+    <dxi-item location="after">
+      <dx-button
+        text="Refresh"
+        icon="refresh"
+        stylingMode="contained"
+        type="default"
+        [disabled]="loading()"
+        (onClick)="refreshRates()">
+      </dx-button>
+    </dxi-item>
+  </dx-toolbar>
+
+  <div page-content>
+    @if (loading()) {
+      <p>Loading data...</p>
+    } @else if (error()) {
+      <p class="error">{{ error() }}</p>
+    } @else {
+      <div class="tables-layout">
+        <section class="table-card">
+          <h3>Currency Rates</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Description</th>
+                <th>Value</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of currencies(); track row.code) {
+                <tr
+                  (click)="selectCurrencyRow(row.code)"
+                  [class.selected-row]="selectedCurrencyRow() === row.code">
+                  <td>{{ row.code }}</td>
+                  <td>{{ row.description }}</td>
+                  <td>{{ row.value | number:'1.0-6' }}</td>
+                  <td>
+                    <dx-button
+                      text="Hourly"
+                      icon="chart"
+                      stylingMode="text"
+                      type="default"
+                      [disabled]="hourlyLoading()"
+                      (onClick)="loadHourlyFromButton($event, row.code)">
+                    </dx-button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+
+          <h3>Commodities</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Description</th>
+                <th>Value</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of commodities(); track row.code) {
+                <tr
+                  (click)="selectCurrencyRow(row.code)"
+                  [class.selected-row]="selectedCurrencyRow() === row.code">
+                  <td>{{ row.code }}</td>
+                  <td>{{ row.description }}</td>
+                  <td>{{ row.value | number:'1.0-6' }}</td>
+                  <td>
+                    <dx-button
+                      text="Hourly"
+                      icon="chart"
+                      stylingMode="text"
+                      type="default"
+                      [disabled]="hourlyLoading()"
+                      (onClick)="loadHourlyFromButton($event, row.code)">
+                    </dx-button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </section>
+
+        <section class="table-card chart-card">
+          <h3>Hourly Chart {{ selectedCurrencyRow() ?? '' }}</h3>
+
+          @if (hourlyLoading()) {
+            <p class="grid-state">Loading chart...</p>
+          } @else if (hourlyError()) {
+            <p class="error">{{ hourlyError() }}</p>
+          } @else if (hourlyRates().length === 0) {
+            <p class="grid-state">Select a currency row and click Hourly.</p>
+          } @else {
+            <dx-chart
+              class="chart-host"
+              [dataSource]="chartRates()">
+              <dxo-common-series-settings
+                argumentField="timestampDate"
+                valueField="value"
+                type="line">
+              </dxo-common-series-settings>
+              <dxo-argument-axis
+                argumentType="datetime"
+                [visualRange]="chartVisualRange()">
+              </dxo-argument-axis>
+              <dxo-scroll-bar [visible]="true"></dxo-scroll-bar>
+              <dxo-zoom-and-pan
+                argumentAxis="both"
+                [dragToZoom]="true"
+                [allowMouseWheel]="true"
+                [allowTouchGestures]="true">
+              </dxo-zoom-and-pan>
+              <dxi-series name="Rate"></dxi-series>
+              <dxo-legend [visible]="false"></dxo-legend>
+              <dxo-tooltip
+                [enabled]="true"
+                [customizeTooltip]="customizeChartTooltip">
+              </dxo-tooltip>
+            </dx-chart>
+          }
+        </section>
+      </div>
+    }
+  </div>
+</app-page-shell>

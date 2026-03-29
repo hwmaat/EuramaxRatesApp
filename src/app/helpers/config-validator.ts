@@ -8,7 +8,6 @@ export function validateConfig(config: IAppConfig): void {
     'client',
     'title',
     'backgroundImage',
-    'logo',
     'theme',
     'version',
     'apiKey'

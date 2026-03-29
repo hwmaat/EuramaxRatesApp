@@ -39,6 +39,8 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/Rates/",
+              "deployUrl": "/Rates/",
               "budgets": [
                 {
                   "type": "initial",

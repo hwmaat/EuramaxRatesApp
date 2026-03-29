@@ -1,0 +1,81 @@
+
+.error {
+	margin-top: 0;
+}
+
+.grid-state {
+	margin: 0.75rem;
+}
+
+.tables-layout {
+	display: grid;
+	grid-template-columns: minmax(260px, 380px) minmax(420px, 1fr);
+	gap: 1rem;
+	align-items: start;
+	justify-content: stretch;
+}
+
+.table-card {
+	border: 1px solid;
+	border-radius: 8px;
+	overflow: hidden;
+	max-width: 420px;
+}
+
+.chart-card {
+	max-width: none;
+}
+
+.chart-host {
+	height: 320px;
+	width: 100%;
+}
+
+.table-card h3 {
+	margin: 0;
+	padding: 0.5rem 0.75rem;
+	border-bottom: 1px solid;
+	font-size: 0.95rem;
+	line-height: 1.2;
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+th,
+td {
+	text-align: left;
+	padding: 0.4rem 0.6rem;
+	border-bottom: 1px solid;
+}
+
+.selected-row {
+	font-weight: 600;
+}
+
+th {
+	font-size: 0.85rem;
+}
+
+tbody tr:last-child td {
+	border-bottom: none;
+}
+
+@media (max-width: 1024px) {
+	.tables-layout {
+		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 1400px) {
+	.tables-layout {
+		grid-template-columns: 1fr;
+	}
+
+	.chart-card {
+		grid-column: 1 / -1;
+	}
+}
+

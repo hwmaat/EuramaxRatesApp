@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable, inject, effect } from "@angular/core";
-import { BehaviorSubject, catchError, filter, Observable, of, switchMap, take } from "rxjs";
+import { BehaviorSubject, catchError, filter, map, Observable, of, switchMap, take } from "rxjs";
 import { Globals } from "./globals.service";
 import { VersionInfoDto } from "@app/models/version.model";
 
@@ -55,8 +55,10 @@ export class ApiService {
     });
   }
 
-  ping(endpoint: string) {
-    return this.get<void>(endpoint);
+  ping(endpoint: string): Observable<void> {
+    return this.http
+      .get(this.buildUrl(endpoint), { responseType: 'text' })
+      .pipe(map((): void => undefined));
   }
 
   pingWhenReady(endpoint: string) {
